@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "111390648350",
+    "project_id": "aila-388e8",
+    "storage_bucket": "aila-388e8.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:111390648350:android:371cdb649519b27d23e60f",
+        "android_client_info": {
+          "package_name": "com.aila.beauty"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD98F9ebJ6uPnRCeYVEAJVx--Z_xneWPGI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
