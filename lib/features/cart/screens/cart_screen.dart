@@ -3,10 +3,30 @@ import 'package:app_aila/core/theme/app_icons.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../../../core/navigation/app_shell_controller.dart';
-import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/app_notifications.dart';
 import '../providers/cart_provider.dart';
 import 'checkout_screen.dart';
+
+class _AuraColors {
+  _AuraColors._();
+
+  static const primary = Color(0xFF4A3428);
+  static const roseGold = primary;
+  static const rosePink = Color(0xFFC8B59E);
+  static const blush = Color(0xFFEADCC8);
+  static const background = Color(0xFFF8F5F0);
+  static const surface = Color(0xFFFCFAF6);
+  static const divider = Color(0xFFE4DBCE);
+  static const mauve = Color(0xFF2E211B);
+  static const taupe = Color(0xFF6D5A4D);
+  static const shadowCard = Color(0x142E211B);
+  static const shadowSoft = Color(0x242E211B);
+  static const blushGradient = LinearGradient(
+    colors: [Color(0xFFEADCC8), Color(0xFFEADCC8)],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+}
 
 class CartScreen extends StatelessWidget {
   const CartScreen({super.key});
@@ -14,47 +34,57 @@ class CartScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cart = context.watch<CartProvider>();
+    final bottomInset = MediaQuery.viewPaddingOf(context).bottom;
+    final checkoutBottom = 104.0 + (bottomInset > 14 ? bottomInset - 14 : 0);
 
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
-        backgroundColor: const Color(0xFFFFF6F5),
+        backgroundColor: _AuraColors.background,
         body: SafeArea(
           bottom: false,
-          child: Column(
+          child: Stack(
             children: [
-              const _PremiumCartHeader(),
-              Expanded(
-                child: cart.items.isEmpty
-                    ? const _EmptyCartState()
-                    : ListView(
-                        physics: const BouncingScrollPhysics(),
-                        padding: const EdgeInsets.fromLTRB(15, 4, 15, 118),
-                        children: [
-                          Text(
-                            _bagCountLabel(cart.itemCount),
-                            style: GoogleFonts.cairo(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                              color: AppColors.taupe,
-                              height: 1.2,
+              Column(
+                children: [
+                  _PremiumCartHeader(itemCount: cart.itemCount),
+                  Expanded(
+                    child: cart.items.isEmpty
+                        ? const _EmptyCartState()
+                        : ListView(
+                            physics: const BouncingScrollPhysics(),
+                            padding: EdgeInsets.fromLTRB(
+                              24,
+                              8,
+                              24,
+                              checkoutBottom + 92,
                             ),
+                            children: [
+                              _ShippingBanner(totalPrice: cart.totalPrice),
+                              const SizedBox(height: 16),
+                              for (final item in cart.items) ...[
+                                _CartItemCard(item: item, cartProvider: cart),
+                                const SizedBox(height: 12),
+                              ],
+                              const SizedBox(height: 8),
+                              _OrderSummaryCard(totalPrice: cart.totalPrice),
+                            ],
                           ),
-                          const SizedBox(height: 18),
-                          for (final item in cart.items) ...[
-                            _CartItemCard(item: item, cartProvider: cart),
-                            const SizedBox(height: 13),
-                          ],
-                          const SizedBox(height: 8),
-                          _OrderSummaryCard(totalPrice: cart.totalPrice),
-                          const SizedBox(height: 16),
-                          _CheckoutButton(
-                            totalPrice: cart.totalPrice,
-                            canCheckout: cart.canCheckout,
-                          ),
-                        ],
-                      ),
+                  ),
+                ],
               ),
+              if (cart.items.isNotEmpty)
+                Positioned(
+                  left: 16,
+                  right: 16,
+                  // Keep the checkout capsule visibly separated from the
+                  // shell's floating navigation capsule.
+                  bottom: checkoutBottom,
+                  child: _CheckoutButton(
+                    totalPrice: cart.totalPrice,
+                    canCheckout: cart.canCheckout,
+                  ),
+                ),
             ],
           ),
         ),
@@ -72,6 +102,46 @@ class CartScreen extends StatelessWidget {
   }
 }
 
+class _ShippingBanner extends StatelessWidget {
+  final double totalPrice;
+
+  const _ShippingBanner({required this.totalPrice});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: _AuraColors.blush.withValues(alpha: 0.72),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Row(
+        children: [
+          const Icon(
+            AppIcons.local_shipping_rounded,
+            size: 18,
+            color: _AuraColors.primary,
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              totalPrice > 0
+                  ? 'سيتم احتساب التوصيل بدقة بعد اختيار العنوان.'
+                  : 'أضيفي منتجاتك المفضلة لبدء الطلب.',
+              style: GoogleFonts.cairo(
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+                color: _AuraColors.mauve,
+                height: 1.4,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class _CartItemCard extends StatelessWidget {
   final CartItem item;
   final CartProvider cartProvider;
@@ -83,18 +153,12 @@ class _CartItemCard extends StatelessWidget {
     final subtitle = item.variantInfo?.trim();
 
     return Container(
-      constraints: const BoxConstraints(minHeight: 120),
-      padding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
+      constraints: const BoxConstraints(minHeight: 136),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(30),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.roseGold.withValues(alpha: 0.045),
-            blurRadius: 20,
-            offset: const Offset(0, 9),
-          ),
-        ],
+        color: _AuraColors.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: _AuraColors.divider.withValues(alpha: 0.78)),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -103,7 +167,7 @@ class _CartItemCard extends StatelessWidget {
           const SizedBox(width: 12),
           Expanded(
             child: SizedBox(
-              height: 96,
+              height: 112,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -118,9 +182,9 @@ class _CartItemCard extends StatelessWidget {
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: GoogleFonts.cairo(
-                              fontSize: 16,
+                              fontSize: 14,
                               fontWeight: FontWeight.w600,
-                              color: AppColors.mauve,
+                              color: _AuraColors.mauve,
                               height: 1.05,
                             ),
                           ),
@@ -134,7 +198,7 @@ class _CartItemCard extends StatelessWidget {
                           child: Icon(
                             AppIcons.close_rounded,
                             size: 17,
-                            color: AppColors.taupe,
+                            color: _AuraColors.taupe,
                           ),
                         ),
                       ),
@@ -148,7 +212,7 @@ class _CartItemCard extends StatelessWidget {
                       style: GoogleFonts.cairo(
                         fontSize: 11,
                         fontWeight: FontWeight.w400,
-                        color: AppColors.taupe,
+                        color: _AuraColors.taupe,
                         height: 1.15,
                       ),
                     )
@@ -160,7 +224,7 @@ class _CartItemCard extends StatelessWidget {
                       style: GoogleFonts.cairo(
                         fontSize: 11,
                         fontWeight: FontWeight.w400,
-                        color: AppColors.taupe,
+                        color: _AuraColors.taupe,
                         height: 1.15,
                       ),
                     ),
@@ -171,9 +235,9 @@ class _CartItemCard extends StatelessWidget {
                       Text(
                         _formatCompactMoney(item.price),
                         style: GoogleFonts.cairo(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w700,
-                          color: AppColors.mauve,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: _AuraColors.mauve,
                           height: 1,
                         ),
                       ),
@@ -200,13 +264,13 @@ class _CartProductImage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: 96,
-      height: 96,
+      height: 112,
       decoration: BoxDecoration(
-        color: AppColors.blush,
-        borderRadius: BorderRadius.circular(25),
+        color: _AuraColors.blush,
+        borderRadius: BorderRadius.circular(12),
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(25),
+        borderRadius: BorderRadius.circular(12),
         child: item.imageUrl.trim().isNotEmpty
             ? Image.network(
                 item.imageUrl,
@@ -228,11 +292,11 @@ class _CartImageFallback extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DecoratedBox(
-      decoration: const BoxDecoration(gradient: AppColors.blushGradient),
+      decoration: const BoxDecoration(gradient: _AuraColors.blushGradient),
       child: Center(
         child: Icon(
           _getIconForName(name),
-          color: AppColors.roseGold.withValues(alpha: 0.52),
+          color: _AuraColors.roseGold.withValues(alpha: 0.52),
           size: 34,
         ),
       ),
@@ -262,7 +326,7 @@ class _QuantityPill extends StatelessWidget {
       height: 32,
       padding: const EdgeInsets.only(left: 10, right: 4),
       decoration: BoxDecoration(
-        color: const Color(0xFFFBE1E3),
+        color: _AuraColors.blush.withValues(alpha: 0.72),
         borderRadius: BorderRadius.circular(999),
       ),
       child: Row(
@@ -276,7 +340,7 @@ class _QuantityPill extends StatelessWidget {
               child: Icon(
                 AppIcons.remove_rounded,
                 size: 14,
-                color: AppColors.roseGold,
+                color: _AuraColors.roseGold,
               ),
             ),
           ),
@@ -288,7 +352,7 @@ class _QuantityPill extends StatelessWidget {
                 style: GoogleFonts.cairo(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
-                  color: AppColors.mauve,
+                  color: _AuraColors.mauve,
                   height: 1,
                 ),
               ),
@@ -317,8 +381,8 @@ class _QuantityPill extends StatelessWidget {
               height: 26,
               decoration: BoxDecoration(
                 color: item.canIncrease
-                    ? const Color(0xFFC77F91)
-                    : const Color(0xFFDAC7CB),
+                    ? _AuraColors.primary
+                    : _AuraColors.rosePink,
                 shape: BoxShape.circle,
               ),
               child: const Icon(
@@ -344,15 +408,17 @@ class _OrderSummaryCard extends StatelessWidget {
     final totalLabel = _formatTotalMoney(totalPrice);
 
     return Container(
-      padding: const EdgeInsets.fromLTRB(20, 22, 20, 24),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(30),
-        boxShadow: [
+        color: _AuraColors.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: _AuraColors.divider.withValues(alpha: 0.62)),
+        boxShadow: const [
           BoxShadow(
-            color: AppColors.roseGold.withValues(alpha: 0.045),
+            color: _AuraColors.shadowCard,
             blurRadius: 24,
-            offset: const Offset(0, 10),
+            spreadRadius: -12,
+            offset: Offset(0, 8),
           ),
         ],
       ),
@@ -362,7 +428,10 @@ class _OrderSummaryCard extends StatelessWidget {
           const SizedBox(height: 13),
           const _SummaryLine(label: 'التوصيل', value: 'يُحسب حسب العنوان'),
           const SizedBox(height: 17),
-          Divider(color: AppColors.divider.withValues(alpha: 0.85), height: 1),
+          Divider(
+            color: _AuraColors.divider.withValues(alpha: 0.85),
+            height: 1,
+          ),
           const SizedBox(height: 20),
           _SummaryLine(label: 'الإجمالي', value: totalLabel, isTotal: true),
         ],
@@ -388,12 +457,12 @@ class _SummaryLine extends StatelessWidget {
         ? GoogleFonts.cairo(
             fontSize: 16,
             fontWeight: FontWeight.w600,
-            color: AppColors.mauve,
+            color: _AuraColors.mauve,
           )
         : GoogleFonts.cairo(
             fontSize: 14,
             fontWeight: FontWeight.w400,
-            color: AppColors.taupe,
+            color: _AuraColors.taupe,
           );
 
     return Row(
@@ -405,8 +474,8 @@ class _SummaryLine extends StatelessWidget {
           textDirection: TextDirection.rtl,
           style: GoogleFonts.cairo(
             fontSize: isTotal ? 16 : 14,
-            fontWeight: FontWeight.w700,
-            color: AppColors.mauve,
+            fontWeight: FontWeight.w600,
+            color: _AuraColors.mauve,
           ),
         ),
       ],
@@ -439,26 +508,41 @@ class _CheckoutButton extends StatelessWidget {
                 },
           borderRadius: BorderRadius.circular(999),
           child: Ink(
-            height: 54,
+            height: 56,
             decoration: BoxDecoration(
-              gradient: AppColors.roseGradient,
+              color: _AuraColors.primary,
               borderRadius: BorderRadius.circular(999),
               boxShadow: const [
                 BoxShadow(
-                  color: AppColors.shadowSoft,
-                  blurRadius: 20,
-                  offset: Offset(0, 10),
+                  color: _AuraColors.shadowSoft,
+                  blurRadius: 28,
+                  spreadRadius: -10,
+                  offset: Offset(0, 12),
                 ),
               ],
             ),
-            child: Center(
-              child: Text(
-                'إتمام الطلب  ${_formatTotalMoney(totalPrice)}',
-                style: GoogleFonts.cairo(
-                  fontSize: 14.5,
-                  fontWeight: FontWeight.w700,
-                  color: Colors.white,
-                ),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 22),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'إتمام الطلب',
+                    style: GoogleFonts.cairo(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: _AuraColors.surface,
+                    ),
+                  ),
+                  Text(
+                    _formatTotalMoney(totalPrice),
+                    style: GoogleFonts.cairo(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: _AuraColors.surface,
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
@@ -483,11 +567,11 @@ class _EmptyCartState extends StatelessWidget {
               width: 112,
               height: 112,
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: _AuraColors.surface,
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
-                    color: AppColors.roseGold.withValues(alpha: 0.08),
+                    color: _AuraColors.roseGold.withValues(alpha: 0.08),
                     blurRadius: 24,
                     offset: const Offset(0, 10),
                   ),
@@ -496,7 +580,7 @@ class _EmptyCartState extends StatelessWidget {
               child: Icon(
                 AppIcons.shopping_bag_outlined,
                 size: 54,
-                color: AppColors.roseGold.withValues(alpha: 0.62),
+                color: _AuraColors.roseGold.withValues(alpha: 0.62),
               ),
             ),
             const SizedBox(height: 28),
@@ -504,8 +588,8 @@ class _EmptyCartState extends StatelessWidget {
               'سلتك فارغة',
               style: GoogleFonts.cairo(
                 fontSize: 24,
-                fontWeight: FontWeight.w700,
-                color: AppColors.mauve,
+                fontWeight: FontWeight.w600,
+                color: _AuraColors.mauve,
               ),
             ),
             const SizedBox(height: 8),
@@ -515,7 +599,7 @@ class _EmptyCartState extends StatelessWidget {
               style: GoogleFonts.cairo(
                 fontSize: 13,
                 fontWeight: FontWeight.w400,
-                color: AppColors.taupe,
+                color: _AuraColors.taupe,
                 height: 1.45,
               ),
             ),
@@ -523,9 +607,9 @@ class _EmptyCartState extends StatelessWidget {
             OutlinedButton(
               onPressed: () => context.read<AppShellController>().goHome(),
               style: OutlinedButton.styleFrom(
-                foregroundColor: AppColors.roseGold,
+                foregroundColor: _AuraColors.roseGold,
                 side: BorderSide(
-                  color: AppColors.roseGold.withValues(alpha: 0.35),
+                  color: _AuraColors.roseGold.withValues(alpha: 0.35),
                 ),
                 padding: const EdgeInsets.symmetric(
                   horizontal: 28,
@@ -551,14 +635,16 @@ class _EmptyCartState extends StatelessWidget {
 }
 
 class _PremiumCartHeader extends StatelessWidget {
-  const _PremiumCartHeader();
+  final int itemCount;
+
+  const _PremiumCartHeader({required this.itemCount});
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(15, 14, 15, 8),
+      padding: const EdgeInsets.fromLTRB(24, 18, 24, 14),
       child: SizedBox(
-        height: 40,
+        height: 48,
         child: Stack(
           alignment: Alignment.center,
           children: [
@@ -571,20 +657,16 @@ class _PremiumCartHeader extends StatelessWidget {
                   width: 40,
                   height: 40,
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: _AuraColors.surface,
                     shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppColors.roseGold.withValues(alpha: 0.04),
-                        blurRadius: 14,
-                        offset: const Offset(0, 6),
-                      ),
-                    ],
+                    border: Border.all(
+                      color: _AuraColors.divider.withValues(alpha: 0.75),
+                    ),
                   ),
                   child: const Icon(
                     AppIcons.arrow_back_ios_new_rounded,
                     size: 18,
-                    color: AppColors.mauve,
+                    color: _AuraColors.mauve,
                   ),
                 ),
               ),
@@ -592,9 +674,20 @@ class _PremiumCartHeader extends StatelessWidget {
             Text(
               'سلة التسوق',
               style: GoogleFonts.cairo(
-                fontSize: 17,
+                fontSize: 14,
                 fontWeight: FontWeight.w600,
-                color: AppColors.mauve,
+                color: _AuraColors.mauve,
+              ),
+            ),
+            Positioned(
+              bottom: -2,
+              child: Text(
+                CartScreen._bagCountLabel(itemCount),
+                style: GoogleFonts.cairo(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w500,
+                  color: _AuraColors.taupe,
+                ),
               ),
             ),
           ],
@@ -605,9 +698,14 @@ class _PremiumCartHeader extends StatelessWidget {
 }
 
 String _formatCompactMoney(double value) {
-  return '${value.round()} د.ل';
+  return _formatCartMoney(value);
 }
 
 String _formatTotalMoney(double value) {
-  return '${value.round()} د.ل';
+  return _formatCartMoney(value);
+}
+
+String _formatCartMoney(double value) {
+  final decimals = value % 1 == 0 ? 0 : 2;
+  return '${value.toStringAsFixed(decimals)} د.ل';
 }

@@ -1,15 +1,15 @@
-import 'package:app_aila/core/theme/app_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 import '../../../core/models/category_model.dart';
 import '../../../core/models/product_model.dart';
-import '../../../core/theme/app_colors.dart';
-import '../../../shared/widgets/app_error_view.dart';
+import '../../../core/theme/app_icons.dart';
+import '../../../core/utils/app_notifications.dart';
 import '../../home/providers/home_provider.dart';
 import '../../home/screens/category_explorer_screen.dart';
 import '../../home/screens/product_detail_screen.dart';
+import '../../wishlist/providers/wishlist_provider.dart';
 import '../providers/search_provider.dart';
 
 class SearchScreen extends StatefulWidget {
@@ -27,9 +27,7 @@ class _SearchScreenState extends State<SearchScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
-      // تحميل الفئات لقسم "تصفّح حسب الفئة" في الحالة الفارغة.
-      context.read<HomeProvider>().ensureInitialDataLoaded();
+      if (mounted) context.read<HomeProvider>().ensureInitialDataLoaded();
     });
   }
 
@@ -40,16 +38,13 @@ class _SearchScreenState extends State<SearchScreen> {
     super.dispose();
   }
 
-  void _onChanged(String value) {
-    context.read<SearchProvider>().onSearchQueryChanged(value);
-  }
-
-  void _clearQuery() {
+  void _clearSearch() {
     _controller.clear();
     context.read<SearchProvider>().clearSearch();
+    _focusNode.requestFocus();
   }
 
-  void _applyRecentSearch(String query) {
+  void _applyRecent(String query) {
     _controller
       ..text = query
       ..selection = TextSelection.collapsed(offset: query.length);
@@ -58,18 +53,10 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 
   void _openCategory(CategoryModel category) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
         builder: (_) => CategoryExplorerScreen(category: category),
       ),
-    );
-  }
-
-  void _openProduct(ProductModel product) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (_) => ProductDetailScreen(product: product)),
     );
   }
 
@@ -79,59 +66,58 @@ class _SearchScreenState extends State<SearchScreen> {
     final hasQuery = search.searchQuery.trim().isNotEmpty;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFFFF8F8),
+      backgroundColor: _SearchColors.background,
       body: SafeArea(
         bottom: false,
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(18, 14, 18, 16),
+              padding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'AILA BEAUTY',
-                    style: GoogleFonts.cairo(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w600,
-                      letterSpacing: 4,
-                      color: AppColors.roseGold,
-                      height: 1,
+                    'اكتشفي',
+                    style: _searchText(
+                      size: 11,
+                      weight: FontWeight.w500,
+                      color: _SearchColors.mutedText,
+                      letterSpacing: 1.6,
                     ),
                   ),
-                  const SizedBox(height: 7),
+                  const SizedBox(height: 4),
                   Text(
-                    'ابحثي عن منتجك',
-                    style: GoogleFonts.cairo(
-                      fontSize: 24,
-                      fontWeight: FontWeight.w900,
-                      color: AppColors.mauve,
-                      height: 1.1,
-                    ),
+                    'ابحثي عن ما تحبين',
+                    style: _searchText(size: 30, weight: FontWeight.w500),
                   ),
-                  const SizedBox(height: 18),
+                  const SizedBox(height: 24),
                   _SearchField(
                     controller: _controller,
                     focusNode: _focusNode,
                     hasText: _controller.text.isNotEmpty,
-                    onChanged: _onChanged,
-                    onClear: _clearQuery,
+                    onChanged: context
+                        .read<SearchProvider>()
+                        .onSearchQueryChanged,
+                    onClear: _clearSearch,
                   ),
                 ],
               ),
             ),
+            const SizedBox(height: 24),
             Expanded(
               child: hasQuery
-                  ? _SearchResultsView(
-                      search: search,
-                      onRetry: () => _onChanged(search.searchQuery),
-                      onProductTap: _openProduct,
+                  ? _SearchResults(
+                      provider: search,
+                      onRetry: () =>
+                          search.onSearchQueryChanged(search.searchQuery),
                     )
-                  : _SearchEmptyView(
+                  : _DiscoveryView(
                       recentSearches: search.recentSearches,
-                      onRecentTap: _applyRecentSearch,
-                      onClearRecent: () =>
-                          context.read<SearchProvider>().clearRecentSearches(),
+                      onRecentTap: _applyRecent,
+                      onClearRecent: () {
+                        search.clearRecentSearches();
+                      },
                       onCategoryTap: _openCategory,
                     ),
             ),
@@ -142,16 +128,7 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 }
 
-// ----------------------------------------------------------------------------
-// حقل البحث (نمط مطابق لحقل البحث في مستكشف الفئات)
-// ----------------------------------------------------------------------------
 class _SearchField extends StatelessWidget {
-  final TextEditingController controller;
-  final FocusNode focusNode;
-  final bool hasText;
-  final ValueChanged<String> onChanged;
-  final VoidCallback onClear;
-
   const _SearchField({
     required this.controller,
     required this.focusNode,
@@ -160,558 +137,324 @@ class _SearchField extends StatelessWidget {
     required this.onClear,
   });
 
+  final TextEditingController controller;
+  final FocusNode focusNode;
+  final bool hasText;
+  final ValueChanged<String> onChanged;
+  final VoidCallback onClear;
+
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 58,
+      height: 50,
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0xFFF7E7EA), width: 1.1),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.roseGold.withValues(alpha: 0.06),
-            blurRadius: 20,
-            offset: const Offset(0, 9),
-          ),
-        ],
+        color: _SearchColors.surface,
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: _SearchColors.border),
       ),
       child: TextField(
         controller: controller,
         focusNode: focusNode,
         onChanged: onChanged,
-        onTapOutside: (_) => FocusScope.of(context).unfocus(),
-        textDirection: TextDirection.rtl,
+        onTapOutside: (_) => FocusManager.instance.primaryFocus?.unfocus(),
         textInputAction: TextInputAction.search,
-        cursorColor: AppColors.primary,
-        style: GoogleFonts.cairo(
-          fontSize: 14,
-          fontWeight: FontWeight.w700,
-          color: AppColors.textPrimary,
-        ),
+        cursorColor: _SearchColors.primary,
+        style: _searchText(size: 14, weight: FontWeight.w500),
         decoration: InputDecoration(
-          hintText: 'ابحثي عن منتج أو ماركة...',
-          hintStyle: GoogleFonts.cairo(
-            fontSize: 13,
-            fontWeight: FontWeight.w700,
-            color: const Color(0xFFB49DA1),
+          hintText: 'ابحثي عن منتج أو علامة…',
+          hintStyle: _searchText(size: 13, color: _SearchColors.mutedText),
+          prefixIcon: const Icon(
+            AppIcons.search_rounded,
+            size: 19,
+            color: _SearchColors.mutedText,
           ),
-          prefixIcon: Container(
-            width: 44,
-            height: 44,
-            margin: const EdgeInsetsDirectional.only(
-              start: 7,
-              end: 8,
-              top: 7,
-              bottom: 7,
-            ),
-            decoration: BoxDecoration(
-              color: AppColors.primary.withValues(alpha: 0.09),
-              borderRadius: BorderRadius.circular(14),
-            ),
-            child: const Icon(
-              AppIcons.search_rounded,
-              size: 21,
-              color: AppColors.primary,
-            ),
-          ),
-          prefixIconConstraints: const BoxConstraints(
-            minWidth: 60,
-            minHeight: 58,
-          ),
-          suffixIcon: !hasText
-              ? null
-              : Padding(
-                  padding: const EdgeInsetsDirectional.only(end: 6),
-                  child: IconButton(
-                    onPressed: onClear,
-                    splashRadius: 20,
-                    icon: const Icon(
-                      AppIcons.close_rounded,
-                      size: 18,
-                      color: Color(0xFF9E868B),
-                    ),
+          suffixIcon: hasText
+              ? IconButton(
+                  tooltip: 'مسح البحث',
+                  onPressed: onClear,
+                  icon: const Icon(
+                    AppIcons.close_rounded,
+                    size: 18,
+                    color: _SearchColors.text,
                   ),
-                ),
-          suffixIconConstraints: const BoxConstraints(
-            minWidth: 46,
-            minHeight: 58,
-          ),
+                )
+              : null,
           border: InputBorder.none,
           enabledBorder: InputBorder.none,
           focusedBorder: InputBorder.none,
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 6,
-            vertical: 17,
-          ),
+          contentPadding: const EdgeInsets.symmetric(vertical: 14),
         ),
       ),
     );
   }
 }
 
-// ----------------------------------------------------------------------------
-// الحالة الفارغة: عمليات بحث حديثة + تصفّح حسب الفئة
-// ----------------------------------------------------------------------------
-class _SearchEmptyView extends StatelessWidget {
-  final List<String> recentSearches;
-  final ValueChanged<String> onRecentTap;
-  final VoidCallback onClearRecent;
-  final ValueChanged<CategoryModel> onCategoryTap;
-
-  const _SearchEmptyView({
+class _DiscoveryView extends StatelessWidget {
+  const _DiscoveryView({
     required this.recentSearches,
     required this.onRecentTap,
     required this.onClearRecent,
     required this.onCategoryTap,
   });
 
+  final List<String> recentSearches;
+  final ValueChanged<String> onRecentTap;
+  final VoidCallback onClearRecent;
+  final ValueChanged<CategoryModel> onCategoryTap;
+
   @override
   Widget build(BuildContext context) {
-    final homeProvider = context.watch<HomeProvider>();
-    final categories = homeProvider.categories;
-
+    final home = context.watch<HomeProvider>();
     return ListView(
       physics: const BouncingScrollPhysics(),
-      padding: const EdgeInsets.fromLTRB(18, 4, 18, 120),
+      padding: const EdgeInsets.only(bottom: 120),
       children: [
         if (recentSearches.isNotEmpty) ...[
           _SectionHeader(
-            title: 'عمليات بحث حديثة',
-            trailing: GestureDetector(
-              onTap: onClearRecent,
-              child: Text(
-                'مسح',
-                style: GoogleFonts.cairo(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w800,
-                  color: AppColors.roseGold,
-                ),
+            eyebrow: 'آخر ما بحثتِ عنه',
+            title: 'عمليات البحث الأخيرة',
+            actionLabel: 'مسح',
+            onAction: onClearRecent,
+          ),
+          const SizedBox(height: 16),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            child: Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: recentSearches
+                  .map(
+                    (query) => _RecentChip(
+                      label: query,
+                      onTap: () => onRecentTap(query),
+                    ),
+                  )
+                  .toList(),
+            ),
+          ),
+          const SizedBox(height: 40),
+        ] else ...[
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            child: Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: _SearchColors.secondary.withValues(alpha: .55),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Row(
+                children: [
+                  const Icon(
+                    AppIcons.search_rounded,
+                    size: 24,
+                    color: _SearchColors.primary,
+                  ),
+                  const SizedBox(width: 14),
+                  Expanded(
+                    child: Text(
+                      'ابدئي باسم القطعة أو العلامة، أو تصفّحي الفئات أدناه.',
+                      style: _searchText(
+                        size: 13,
+                        color: _SearchColors.mutedText,
+                        height: 1.6,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
-          const SizedBox(height: 14),
-          Wrap(
-            spacing: 10,
-            runSpacing: 10,
-            children: recentSearches
-                .map(
-                  (query) => _RecentChip(
-                    label: query,
-                    onTap: () => onRecentTap(query),
-                  ),
-                )
-                .toList(),
-          ),
-          const SizedBox(height: 30),
-        ] else
-          const _SearchWelcome(),
-        _SectionHeader(
-          title: 'تصفّح حسب الفئة',
-          trailing: const SizedBox.shrink(),
-        ),
+          const SizedBox(height: 40),
+        ],
+        const _SectionHeader(eyebrow: 'الكتالوج', title: 'تصفّحي حسب الفئة'),
         const SizedBox(height: 16),
-        if (homeProvider.isLoadingCategories && categories.isEmpty)
-          const Padding(
-            padding: EdgeInsets.symmetric(vertical: 40),
-            child: Center(
-              child: CircularProgressIndicator(color: AppColors.primary),
+        if (home.isLoadingCategories && home.categories.isEmpty)
+          const _CategoryRailSkeleton()
+        else if (home.categoriesError != null && home.categories.isEmpty)
+          SizedBox(
+            height: 230,
+            child: _SearchErrorState(
+              message: 'تعذّر تحميل الفئات.',
+              onRetry: () => context
+                  .read<HomeProvider>()
+                  .ensureInitialDataLoaded(forceRefresh: true),
             ),
           )
-        else if (categories.isEmpty)
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 30),
-            child: Text(
-              'ستظهر الفئات هنا قريباً.',
-              textAlign: TextAlign.center,
-              style: GoogleFonts.cairo(
-                fontSize: 13,
-                fontWeight: FontWeight.w700,
-                color: AppColors.textSecondary,
-              ),
-            ),
+        else if (home.categories.isEmpty)
+          const _SearchEmptyState(
+            icon: AppIcons.category_outlined,
+            title: 'لا توجد فئات حاليًا',
+            message: 'ستظهر مجموعاتنا هنا فور توفرها.',
           )
         else
-          GridView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: categories.length,
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              crossAxisSpacing: 14,
-              mainAxisSpacing: 14,
-              childAspectRatio: 1.5,
+          SizedBox(
+            height: 246,
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              physics: const BouncingScrollPhysics(),
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              itemCount: home.categories.length,
+              separatorBuilder: (_, _) => const SizedBox(width: 12),
+              itemBuilder: (context, index) {
+                final category = home.categories[index];
+                return SizedBox(
+                  width: 184,
+                  child: _CategoryCard(
+                    category: category,
+                    onTap: () => onCategoryTap(category),
+                  ),
+                );
+              },
             ),
-            itemBuilder: (context, index) {
-              final category = categories[index];
-              return _CategoryCard(
-                category: category,
-                onTap: () => onCategoryTap(category),
-              );
-            },
           ),
       ],
     );
   }
 }
 
-class _SearchWelcome extends StatelessWidget {
-  const _SearchWelcome();
+class _SearchResults extends StatelessWidget {
+  const _SearchResults({required this.provider, required this.onRetry});
+
+  final SearchProvider provider;
+  final VoidCallback onRetry;
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 8, bottom: 30),
-      child: Column(
-        children: [
-          Container(
-            width: 88,
-            height: 88,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              shape: BoxShape.circle,
-              boxShadow: [
-                BoxShadow(
-                  color: AppColors.roseGold.withValues(alpha: 0.10),
-                  blurRadius: 26,
-                  offset: const Offset(0, 12),
-                ),
-              ],
-            ),
-            child: Icon(
-              AppIcons.search_rounded,
-              size: 38,
-              color: AppColors.roseGold.withValues(alpha: 0.7),
-            ),
-          ),
-          const SizedBox(height: 18),
-          Text(
-            'ابحثي عن منتجاتك المفضلة لدى AILA',
-            textAlign: TextAlign.center,
-            style: GoogleFonts.cairo(
-              fontSize: 15,
-              fontWeight: FontWeight.w800,
-              color: AppColors.textPrimary,
-            ),
-          ),
-          const SizedBox(height: 6),
-          Text(
-            'اكتبي اسم المنتج أو الماركة، أو تصفّحي الفئات أدناه.',
-            textAlign: TextAlign.center,
-            style: GoogleFonts.cairo(
-              fontSize: 12.5,
-              fontWeight: FontWeight.w600,
-              color: AppColors.textSecondary,
-              height: 1.5,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
+    if (provider.isLoadingSearch && provider.searchResults.isEmpty) {
+      return const _ProductGridSkeleton();
+    }
+    if (provider.error != null && provider.searchResults.isEmpty) {
+      return _SearchErrorState(message: 'تعذّر تنفيذ البحث.', onRetry: onRetry);
+    }
+    if (provider.searchResults.isEmpty) {
+      return _SearchEmptyState(
+        icon: AppIcons.search_off_rounded,
+        title: 'لا توجد نتائج',
+        message: 'لم نعثر على نتائج لـ «${provider.searchQuery.trim()}».',
+      );
+    }
 
-class _SectionHeader extends StatelessWidget {
-  final String title;
-  final Widget trailing;
-
-  const _SectionHeader({required this.title, required this.trailing});
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return Stack(
       children: [
-        Text(
-          title,
-          style: GoogleFonts.cairo(
-            fontSize: 17,
-            fontWeight: FontWeight.w900,
-            color: AppColors.textPrimary,
-          ),
-        ),
-        trailing,
-      ],
-    );
-  }
-}
-
-class _RecentChip extends StatelessWidget {
-  final String label;
-  final VoidCallback onTap;
-
-  const _RecentChip({required this.label, required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(999),
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-          decoration: BoxDecoration(
-            color: AppColors.blush.withValues(alpha: 0.55),
-            borderRadius: BorderRadius.circular(999),
-            border: Border.all(
-              color: AppColors.rosePink.withValues(alpha: 0.4),
-            ),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                AppIcons.history_rounded,
-                size: 15,
-                color: AppColors.roseGold.withValues(alpha: 0.8),
-              ),
-              const SizedBox(width: 7),
-              Text(
-                label,
-                style: GoogleFonts.cairo(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.mauve,
+        CustomScrollView(
+          physics: const BouncingScrollPhysics(),
+          slivers: [
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(24, 0, 24, 20),
+                child: Row(
+                  children: [
+                    Text(
+                      '${provider.searchResults.length} نتيجة',
+                      style: _searchText(
+                        size: 12,
+                        color: _SearchColors.mutedText,
+                      ),
+                    ),
+                    const Spacer(),
+                    Text(
+                      'الأكثر صلة',
+                      style: _searchText(size: 12, weight: FontWeight.w500),
+                    ),
+                  ],
                 ),
               ),
-            ],
-          ),
+            ),
+            SliverPadding(
+              padding: const EdgeInsets.fromLTRB(24, 0, 24, 120),
+              sliver: SliverGrid(
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  crossAxisSpacing: 16,
+                  mainAxisSpacing: 32,
+                  childAspectRatio: .56,
+                ),
+                delegate: SliverChildBuilderDelegate(
+                  (context, index) => _SearchProductCard(
+                    product: provider.searchResults[index],
+                  ),
+                  childCount: provider.searchResults.length,
+                ),
+              ),
+            ),
+          ],
         ),
-      ),
+        if (provider.isLoadingSearch)
+          const Align(
+            alignment: Alignment.topCenter,
+            child: LinearProgressIndicator(
+              minHeight: 1.5,
+              color: _SearchColors.primary,
+              backgroundColor: Colors.transparent,
+            ),
+          ),
+      ],
     );
   }
 }
 
 class _CategoryCard extends StatelessWidget {
+  const _CategoryCard({required this.category, required this.onTap});
+
   final CategoryModel category;
   final VoidCallback onTap;
 
-  const _CategoryCard({required this.category, required this.onTap});
-
-  int _treeProductsCount(CategoryModel category) {
-    return category.productsCount +
-        category.children.fold<int>(
-          0,
-          (total, child) => total + _treeProductsCount(child),
-        );
-  }
-
   @override
   Widget build(BuildContext context) {
-    final initial = category.name.trim().isEmpty
-        ? 'A'
-        : category.name.trim().characters.first.toUpperCase();
-    final hasChildren =
-        category.children.isNotEmpty || category.childrenCount > 0;
-    final subtitle = hasChildren
-        ? '${category.childrenCount} فئة'
-        : '${_treeProductsCount(category)} منتج';
-
+    final hasImage = (category.imageUrl ?? '').trim().isNotEmpty;
     return Material(
       color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(24),
-        child: Ink(
-          decoration: BoxDecoration(
-            color: const Color(0xFFFFFAFA),
-            borderRadius: BorderRadius.circular(24),
-            border: Border.all(
-              color: AppColors.rosePink.withValues(alpha: 0.4),
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: AppColors.roseGold.withValues(alpha: 0.025),
-                blurRadius: 22,
-                offset: const Offset(0, 12),
-              ),
-            ],
-          ),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(23),
-            child: Stack(
-              children: [
-                PositionedDirectional(
-                  start: 16,
-                  top: 12,
-                  child: Text(
-                    initial,
-                    style: GoogleFonts.cairo(
-                      fontSize: 50,
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.rosePink.withValues(alpha: 0.16),
-                      height: 1,
-                    ),
-                  ),
-                ),
-                Positioned.fill(
-                  child: DecoratedBox(
-                    decoration: BoxDecoration(
-                      gradient: RadialGradient(
-                        center: const Alignment(0.65, 0.85),
-                        radius: 1.05,
-                        colors: [
-                          AppColors.blush.withValues(alpha: 0.42),
-                          Colors.white.withValues(alpha: 0.0),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsetsDirectional.fromSTEB(18, 22, 16, 16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      const Spacer(),
-                      Text(
-                        category.name,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: GoogleFonts.cairo(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w900,
-                          color: AppColors.mauve,
-                          height: 1.15,
-                        ),
-                      ),
-                      const SizedBox(height: 5),
-                      Text(
-                        subtitle,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: GoogleFonts.cairo(
-                          fontSize: 11.5,
-                          fontWeight: FontWeight.w700,
-                          color: AppColors.roseGold,
-                          height: 1,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-// ----------------------------------------------------------------------------
-// حالة النتائج: تحميل / خطأ / لا نتائج / قائمة
-// ----------------------------------------------------------------------------
-class _SearchResultsView extends StatelessWidget {
-  final SearchProvider search;
-  final VoidCallback onRetry;
-  final ValueChanged<ProductModel> onProductTap;
-
-  const _SearchResultsView({
-    required this.search,
-    required this.onRetry,
-    required this.onProductTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    if (search.isLoadingSearch && search.searchResults.isEmpty) {
-      return const _ResultsLoading();
-    }
-
-    if (search.error != null && search.searchResults.isEmpty) {
-      return AppErrorView(error: search.error, onRetry: onRetry);
-    }
-
-    if (search.searchResults.isEmpty) {
-      return _ResultsMessage(
-        icon: AppIcons.search_off_rounded,
-        iconColor: AppColors.primary,
-        iconBg: AppColors.blush.withValues(alpha: 0.6),
-        title: 'لا توجد نتائج',
-        message:
-            'لم نعثر على نتائج لـ «${search.searchQuery.trim()}».\n'
-            'جرّبي كلمات أخرى.',
-      );
-    }
-
-    final results = search.searchResults;
-    return ListView.separated(
-      physics: const BouncingScrollPhysics(),
-      padding: const EdgeInsets.fromLTRB(16, 6, 16, 120),
-      itemCount: results.length,
-      separatorBuilder: (context, index) => const SizedBox(height: 14),
-      itemBuilder: (context, index) {
-        return _ProductResultCard(
-          product: results[index],
-          onTap: () => onProductTap(results[index]),
-        );
-      },
-    );
-  }
-}
-
-class _ResultsLoading extends StatelessWidget {
-  const _ResultsLoading();
-
-  @override
-  Widget build(BuildContext context) {
-    return ListView.separated(
-      physics: const NeverScrollableScrollPhysics(),
-      padding: const EdgeInsets.fromLTRB(16, 6, 16, 16),
-      itemCount: 5,
-      separatorBuilder: (context, index) => const SizedBox(height: 14),
-      itemBuilder: (context, index) {
-        return Container(
-          height: 104,
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(18),
-            border: Border.all(color: const Color(0xFFF4E8EA)),
-          ),
-          padding: const EdgeInsets.all(12),
-          child: Row(
+        borderRadius: BorderRadius.circular(16),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(16),
+          child: Stack(
+            fit: StackFit.expand,
             children: [
-              Container(
-                width: 80,
-                height: 80,
-                decoration: BoxDecoration(
-                  color: AppColors.blush.withValues(alpha: 0.5),
-                  borderRadius: BorderRadius.circular(14),
-                ),
+              _SearchNetworkImage(
+                url: category.imageUrl,
+                fallbackIcon: AppIcons.checkroom_outlined,
               ),
-              const SizedBox(width: 14),
-              Expanded(
+              if (hasImage)
+                const DecoratedBox(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [Colors.transparent, Color(0x994A3428)],
+                      stops: [.4, 1],
+                    ),
+                  ),
+                ),
+              PositionedDirectional(
+                start: 14,
+                end: 14,
+                bottom: 14,
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Container(
-                      height: 14,
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        color: AppColors.blush.withValues(alpha: 0.5),
-                        borderRadius: BorderRadius.circular(999),
+                    Text(
+                      '${_categoryCount(category)} قطعة',
+                      style: _searchText(
+                        size: 10,
+                        color: hasImage
+                            ? _SearchColors.onPrimary.withValues(alpha: .8)
+                            : _SearchColors.mutedText,
+                        letterSpacing: 1.2,
                       ),
                     ),
-                    const SizedBox(height: 10),
-                    Container(
-                      height: 12,
-                      width: 110,
-                      decoration: BoxDecoration(
-                        color: AppColors.blush.withValues(alpha: 0.4),
-                        borderRadius: BorderRadius.circular(999),
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    Container(
-                      height: 13,
-                      width: 70,
-                      decoration: BoxDecoration(
-                        color: AppColors.blush.withValues(alpha: 0.55),
-                        borderRadius: BorderRadius.circular(999),
+                    const SizedBox(height: 3),
+                    Text(
+                      category.name,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: _searchText(
+                        size: 17,
+                        weight: FontWeight.w500,
+                        color: hasImage
+                            ? _SearchColors.onPrimary
+                            : _SearchColors.text,
                       ),
                     ),
                   ],
@@ -719,59 +462,442 @@ class _ResultsLoading extends StatelessWidget {
               ),
             ],
           ),
-        );
-      },
+        ),
+      ),
     );
   }
 }
 
-class _ResultsMessage extends StatelessWidget {
-  final IconData icon;
-  final Color iconColor;
-  final Color iconBg;
-  final String title;
-  final String message;
+class _SearchProductCard extends StatelessWidget {
+  const _SearchProductCard({required this.product});
 
-  const _ResultsMessage({
+  final ProductModel product;
+
+  @override
+  Widget build(BuildContext context) {
+    final label = (product.category?.name ?? product.brand?.name ?? 'لونورا')
+        .trim();
+    final showSale =
+        product.pricing.isOnSale &&
+        product.pricing.price > product.pricing.effectivePrice;
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () => Navigator.of(context).push(
+          MaterialPageRoute<void>(
+            builder: (_) => ProductDetailScreen(product: product),
+          ),
+        ),
+        borderRadius: BorderRadius.circular(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            AspectRatio(
+              aspectRatio: 4 / 5,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(16),
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    _SearchNetworkImage(
+                      url: product.thumbnail,
+                      fallbackIcon: AppIcons.inventory_2_outlined,
+                    ),
+                    if (showSale)
+                      PositionedDirectional(
+                        start: 12,
+                        top: 12,
+                        child: _SaleBadge(
+                          discount: product.pricing.discountPercentage,
+                        ),
+                      ),
+                    PositionedDirectional(
+                      end: 12,
+                      top: 12,
+                      child: Consumer<WishlistProvider>(
+                        builder: (context, wishlist, _) {
+                          final saved = wishlist.isFavorite(product.id);
+                          return _FavoriteButton(
+                            saved: saved,
+                            onTap: () {
+                              wishlist.toggleFavorite(product);
+                              AppNotifications.showSuccess(
+                                context,
+                                saved
+                                    ? 'تمت الإزالة من المفضلة'
+                                    : 'تم الحفظ في المفضلة',
+                              );
+                            },
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: _searchText(size: 11, color: _SearchColors.mutedText),
+            ),
+            const SizedBox(height: 3),
+            Text(
+              product.name,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: _searchText(
+                size: 14,
+                weight: FontWeight.w500,
+                height: 1.35,
+              ),
+            ),
+            const SizedBox(height: 5),
+            Row(
+              children: [
+                Text(
+                  _price(product.pricing.effectivePrice),
+                  style: _searchText(size: 14, weight: FontWeight.w500),
+                ),
+                if (showSale) ...[
+                  const SizedBox(width: 8),
+                  Flexible(
+                    child: Text(
+                      _price(product.pricing.price),
+                      maxLines: 1,
+                      style: _searchText(
+                        size: 11,
+                        color: _SearchColors.mutedText,
+                        decoration: TextDecoration.lineThrough,
+                      ),
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _SectionHeader extends StatelessWidget {
+  const _SectionHeader({
+    required this.eyebrow,
+    required this.title,
+    this.actionLabel,
+    this.onAction,
+  });
+
+  final String eyebrow;
+  final String title;
+  final String? actionLabel;
+  final VoidCallback? onAction;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  eyebrow,
+                  style: _searchText(
+                    size: 11,
+                    weight: FontWeight.w500,
+                    color: _SearchColors.mutedText,
+                    letterSpacing: 1.4,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  title,
+                  style: _searchText(size: 24, weight: FontWeight.w500),
+                ),
+              ],
+            ),
+          ),
+          if (actionLabel != null && onAction != null)
+            TextButton(
+              onPressed: onAction,
+              style: TextButton.styleFrom(
+                foregroundColor: _SearchColors.text,
+                padding: const EdgeInsets.symmetric(horizontal: 4),
+              ),
+              child: Text(
+                actionLabel!,
+                style: _searchText(size: 12, weight: FontWeight.w500),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+class _RecentChip extends StatelessWidget {
+  const _RecentChip({required this.label, required this.onTap});
+
+  final String label;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: _SearchColors.surface,
+      shape: const StadiumBorder(side: BorderSide(color: _SearchColors.border)),
+      child: InkWell(
+        onTap: onTap,
+        customBorder: const StadiumBorder(),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(
+                AppIcons.history_rounded,
+                size: 15,
+                color: _SearchColors.mutedText,
+              ),
+              const SizedBox(width: 6),
+              Text(
+                label,
+                style: _searchText(size: 12, weight: FontWeight.w500),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _FavoriteButton extends StatelessWidget {
+  const _FavoriteButton({required this.saved, required this.onTap});
+
+  final bool saved;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: _SearchColors.background.withValues(alpha: .88),
+      shape: const CircleBorder(),
+      child: InkWell(
+        onTap: onTap,
+        customBorder: const CircleBorder(),
+        child: SizedBox(
+          width: 36,
+          height: 36,
+          child: Icon(
+            saved
+                ? AppIcons.favorite_rounded
+                : AppIcons.favorite_border_rounded,
+            size: 18,
+            color: saved ? _SearchColors.accent : _SearchColors.text,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _SaleBadge extends StatelessWidget {
+  const _SaleBadge({required this.discount});
+
+  final int discount;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
+      decoration: BoxDecoration(
+        color: _SearchColors.background.withValues(alpha: .9),
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: Text(
+        '−$discount%',
+        style: _searchText(size: 10, weight: FontWeight.w500),
+      ),
+    );
+  }
+}
+
+class _SearchNetworkImage extends StatelessWidget {
+  const _SearchNetworkImage({required this.url, required this.fallbackIcon});
+
+  final String? url;
+  final IconData fallbackIcon;
+
+  @override
+  Widget build(BuildContext context) {
+    final normalized = url?.trim();
+    if (normalized == null || normalized.isEmpty) {
+      return _SearchImageFallback(icon: fallbackIcon);
+    }
+    return Image.network(
+      normalized,
+      fit: BoxFit.cover,
+      filterQuality: FilterQuality.medium,
+      errorBuilder: (_, _, _) => _SearchImageFallback(icon: fallbackIcon),
+    );
+  }
+}
+
+class _SearchImageFallback extends StatelessWidget {
+  const _SearchImageFallback({required this.icon});
+
+  final IconData icon;
+
+  @override
+  Widget build(BuildContext context) {
+    return ColoredBox(
+      color: _SearchColors.secondary.withValues(alpha: .65),
+      child: Center(
+        child: Icon(
+          icon,
+          size: 32,
+          color: _SearchColors.primary.withValues(alpha: .44),
+        ),
+      ),
+    );
+  }
+}
+
+class _ProductGridSkeleton extends StatelessWidget {
+  const _ProductGridSkeleton();
+
+  @override
+  Widget build(BuildContext context) {
+    return GridView.builder(
+      physics: const NeverScrollableScrollPhysics(),
+      padding: const EdgeInsets.fromLTRB(24, 0, 24, 120),
+      itemCount: 6,
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        crossAxisSpacing: 16,
+        mainAxisSpacing: 32,
+        childAspectRatio: .56,
+      ),
+      itemBuilder: (_, _) => const Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          AspectRatio(aspectRatio: 4 / 5, child: _SkeletonBox(radius: 16)),
+          SizedBox(height: 12),
+          _SkeletonLine(width: 70),
+          SizedBox(height: 8),
+          _SkeletonLine(width: 120),
+          SizedBox(height: 8),
+          _SkeletonLine(width: 80),
+        ],
+      ),
+    );
+  }
+}
+
+class _CategoryRailSkeleton extends StatelessWidget {
+  const _CategoryRailSkeleton();
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 246,
+      child: ListView(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 24),
+        children: const [
+          SizedBox(width: 184, child: _SkeletonBox(radius: 16)),
+          SizedBox(width: 12),
+          SizedBox(width: 184, child: _SkeletonBox(radius: 16)),
+        ],
+      ),
+    );
+  }
+}
+
+class _SkeletonBox extends StatelessWidget {
+  const _SkeletonBox({required this.radius});
+
+  final double radius;
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: _SearchColors.secondary.withValues(alpha: .52),
+        borderRadius: BorderRadius.circular(radius),
+      ),
+    );
+  }
+}
+
+class _SkeletonLine extends StatelessWidget {
+  const _SkeletonLine({required this.width});
+
+  final double width;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: width,
+      height: 10,
+      decoration: BoxDecoration(
+        color: _SearchColors.secondary.withValues(alpha: .55),
+        borderRadius: BorderRadius.circular(999),
+      ),
+    );
+  }
+}
+
+class _SearchEmptyState extends StatelessWidget {
+  const _SearchEmptyState({
     required this.icon,
-    required this.iconColor,
-    required this.iconBg,
     required this.title,
     required this.message,
   });
+
+  final IconData icon;
+  final String title;
+  final String message;
 
   @override
   Widget build(BuildContext context) {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(28),
+        padding: const EdgeInsets.all(32),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              width: 88,
-              height: 88,
-              decoration: BoxDecoration(color: iconBg, shape: BoxShape.circle),
-              child: Icon(icon, size: 40, color: iconColor),
+              width: 68,
+              height: 68,
+              decoration: const BoxDecoration(
+                color: _SearchColors.secondary,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(icon, size: 28, color: _SearchColors.primary),
             ),
             const SizedBox(height: 18),
             Text(
               title,
               textAlign: TextAlign.center,
-              style: GoogleFonts.cairo(
-                fontSize: 18,
-                fontWeight: FontWeight.w900,
-                color: AppColors.textPrimary,
-              ),
+              style: _searchText(size: 18, weight: FontWeight.w500),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 7),
             Text(
               message,
               textAlign: TextAlign.center,
-              style: GoogleFonts.cairo(
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
-                color: AppColors.textSecondary,
+              style: _searchText(
+                size: 13,
+                color: _SearchColors.mutedText,
                 height: 1.6,
               ),
             ),
@@ -782,187 +908,101 @@ class _ResultsMessage extends StatelessWidget {
   }
 }
 
-// ----------------------------------------------------------------------------
-// بطاقة نتيجة المنتج (نمط مطابق لبطاقة قائمة المنتج في مستكشف الفئات)
-// ----------------------------------------------------------------------------
-class _ProductResultCard extends StatelessWidget {
-  final ProductModel product;
-  final VoidCallback onTap;
+class _SearchErrorState extends StatelessWidget {
+  const _SearchErrorState({required this.message, required this.onRetry});
 
-  const _ProductResultCard({required this.product, required this.onTap});
+  final String message;
+  final VoidCallback onRetry;
 
   @override
   Widget build(BuildContext context) {
-    final imageUrl = product.thumbnail?.trim();
-
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(18),
-        child: Ink(
-          height: 104,
-          padding: const EdgeInsets.fromLTRB(12, 12, 16, 12),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(18),
-            border: Border.all(color: const Color(0xFFF4E8EA)),
-            boxShadow: [
-              BoxShadow(
-                color: AppColors.mauve.withValues(alpha: 0.055),
-                blurRadius: 18,
-                offset: const Offset(0, 7),
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(28),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const CircleAvatar(
+              radius: 30,
+              backgroundColor: _SearchColors.secondary,
+              child: Icon(
+                AppIcons.wifi_off_rounded,
+                color: _SearchColors.primary,
               ),
-            ],
-          ),
-          child: Row(
-            children: [
-              _ProductThumb(imageUrl: imageUrl, inStock: product.isPurchasable),
-              const SizedBox(width: 14),
-              Expanded(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Text(
-                      product.name,
-                      textAlign: TextAlign.right,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: GoogleFonts.cairo(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w900,
-                        color: AppColors.textPrimary,
-                        height: 1.25,
-                      ),
-                    ),
-                    if (product.brand?.name != null) ...[
-                      const SizedBox(height: 3),
-                      Text(
-                        product.brand!.name,
-                        textAlign: TextAlign.right,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: GoogleFonts.cairo(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w700,
-                          color: const Color(0xFF9E868B),
-                          height: 1.2,
-                        ),
-                      ),
-                    ],
-                    const SizedBox(height: 5),
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        if (product.pricing.isOnSale) ...[
-                          Text(
-                            '${product.pricing.price.toStringAsFixed(2)} د.ل',
-                            style: GoogleFonts.cairo(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w700,
-                              color: AppColors.textHint,
-                              decoration: TextDecoration.lineThrough,
-                              height: 1,
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                        ],
-                        Text(
-                          '${product.pricing.effectivePrice.toStringAsFixed(2)} د.ل',
-                          style: GoogleFonts.cairo(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w900,
-                            color: AppColors.primary,
-                            height: 1,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
+            ),
+            const SizedBox(height: 14),
+            Text(
+              message,
+              textAlign: TextAlign.center,
+              style: _searchText(size: 15, weight: FontWeight.w500),
+            ),
+            const SizedBox(height: 14),
+            FilledButton(
+              onPressed: onRetry,
+              style: FilledButton.styleFrom(
+                backgroundColor: _SearchColors.primary,
+                foregroundColor: _SearchColors.onPrimary,
+                elevation: 0,
+                shape: const StadiumBorder(),
+              ),
+              child: Text(
+                'إعادة المحاولة',
+                style: _searchText(
+                  size: 12,
+                  weight: FontWeight.w500,
+                  color: _SearchColors.onPrimary,
                 ),
               ),
-              const SizedBox(width: 12),
-              const Icon(
-                AppIcons.arrow_forward_ios_rounded,
-                size: 17,
-                color: Color(0xFFCDBABE),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
   }
 }
 
-class _ProductThumb extends StatelessWidget {
-  final String? imageUrl;
-  final bool inStock;
+class _SearchColors {
+  const _SearchColors._();
 
-  const _ProductThumb({required this.imageUrl, required this.inStock});
-
-  @override
-  Widget build(BuildContext context) {
-    return Stack(
-      clipBehavior: Clip.none,
-      children: [
-        Container(
-          width: 80,
-          height: 80,
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: const Color(0xFFFCEEF0),
-            borderRadius: BorderRadius.circular(14),
-          ),
-          clipBehavior: Clip.antiAlias,
-          child: imageUrl != null && imageUrl!.isNotEmpty
-              ? Image.network(
-                  imageUrl!,
-                  fit: BoxFit.contain,
-                  cacheWidth: 220,
-                  filterQuality: FilterQuality.medium,
-                  errorBuilder: (context, error, stackTrace) =>
-                      const _ProductImageFallback(),
-                )
-              : const _ProductImageFallback(),
-        ),
-        PositionedDirectional(
-          top: -4,
-          end: -4,
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            decoration: BoxDecoration(
-              color: inStock
-                  ? const Color(0xFFE8F5E9)
-                  : const Color(0xFFFFEBEE),
-              borderRadius: BorderRadius.circular(999),
-            ),
-            child: Text(
-              inStock ? 'متوفر' : 'غير متوفر',
-              style: GoogleFonts.cairo(
-                fontSize: 9,
-                fontWeight: FontWeight.w800,
-                color: inStock ? AppColors.success : const Color(0xFFD32F2F),
-                height: 1,
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
+  static const background = Color(0xFFF8F5F0);
+  static const surface = Color(0xFFFCFAF6);
+  static const primary = Color(0xFF4A3428);
+  static const onPrimary = Color(0xFFFFFBF5);
+  static const secondary = Color(0xFFEADCC8);
+  static const text = Color(0xFF2E211B);
+  static const mutedText = Color(0xFF6D5A4D);
+  static const border = Color(0xFFE4DBCE);
+  static const accent = Color(0xFFB88746);
 }
 
-class _ProductImageFallback extends StatelessWidget {
-  const _ProductImageFallback();
+TextStyle _searchText({
+  required double size,
+  FontWeight weight = FontWeight.w400,
+  Color color = _SearchColors.text,
+  double? height,
+  double? letterSpacing,
+  TextDecoration? decoration,
+}) {
+  return GoogleFonts.cairo(
+    fontSize: size,
+    fontWeight: weight,
+    color: color,
+    height: height,
+    letterSpacing: letterSpacing,
+    decoration: decoration,
+    decorationColor: color,
+  );
+}
 
-  @override
-  Widget build(BuildContext context) {
-    return const Icon(
-      AppIcons.inventory_2_rounded,
-      size: 34,
-      color: AppColors.primary,
-    );
-  }
+String _price(double value) {
+  final decimals = value % 1 == 0 ? 0 : 2;
+  return '${value.toStringAsFixed(decimals)} د.ل';
+}
+
+int _categoryCount(CategoryModel category) {
+  return category.productsCount +
+      category.children.fold<int>(
+        0,
+        (total, child) => total + _categoryCount(child),
+      );
 }

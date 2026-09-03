@@ -232,7 +232,7 @@ class _WalletTopUpSheetState extends State<WalletTopUpSheet> {
           key: _formKey,
           child: SingleChildScrollView(
             keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-            padding: EdgeInsets.fromLTRB(20, 10, 20, 18 + bottomPadding),
+            padding: EdgeInsets.fromLTRB(24, 10, 24, 18 + bottomPadding),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -250,7 +250,7 @@ class _WalletTopUpSheetState extends State<WalletTopUpSheet> {
                         'كم تريدين أن تشحني؟',
                         style: GoogleFonts.cairo(
                           fontSize: 16,
-                          fontWeight: FontWeight.w800,
+                          fontWeight: FontWeight.w600,
                           color: AppColors.textPrimary,
                         ),
                       ),
@@ -292,14 +292,14 @@ class _WalletTopUpSheetState extends State<WalletTopUpSheet> {
                         },
                         style: GoogleFonts.cairo(
                           fontSize: 30,
-                          fontWeight: FontWeight.w800,
+                          fontWeight: FontWeight.w600,
                           color: AppColors.textPrimary,
                         ),
                         decoration: InputDecoration(
                           hintText: '0',
                           hintStyle: GoogleFonts.cairo(
                             fontSize: 30,
-                            fontWeight: FontWeight.w800,
+                            fontWeight: FontWeight.w600,
                             color: AppColors.textHint.withValues(alpha: 0.35),
                           ),
                           suffixIcon: Container(
@@ -309,7 +309,7 @@ class _WalletTopUpSheetState extends State<WalletTopUpSheet> {
                               'د.ل',
                               style: GoogleFonts.cairo(
                                 fontSize: 15,
-                                fontWeight: FontWeight.w800,
+                                fontWeight: FontWeight.w600,
                                 color: AppColors.primary,
                               ),
                             ),
@@ -319,19 +319,19 @@ class _WalletTopUpSheetState extends State<WalletTopUpSheet> {
                             alpha: 0.55,
                           ),
                           border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(18),
+                            borderRadius: BorderRadius.circular(16),
                             borderSide: const BorderSide(
                               color: AppColors.divider,
                             ),
                           ),
                           enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(18),
+                            borderRadius: BorderRadius.circular(16),
                             borderSide: const BorderSide(
                               color: AppColors.divider,
                             ),
                           ),
                           focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(18),
+                            borderRadius: BorderRadius.circular(16),
                             borderSide: const BorderSide(
                               color: AppColors.primary,
                               width: 1.4,
@@ -406,13 +406,13 @@ class _WalletTopUpSheetState extends State<WalletTopUpSheet> {
                     onPressed: _isLoading ? null : _submit,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.primary,
-                      foregroundColor: Colors.white,
+                      foregroundColor: AppColors.surface,
                       disabledBackgroundColor: AppColors.primary.withValues(
                         alpha: 0.55,
                       ),
                       elevation: 0,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(18),
+                        borderRadius: BorderRadius.circular(16),
                       ),
                     ),
                     child: _isLoading
@@ -420,7 +420,7 @@ class _WalletTopUpSheetState extends State<WalletTopUpSheet> {
                             width: 24,
                             height: 24,
                             child: CircularProgressIndicator(
-                              color: Colors.white,
+                              color: AppColors.surface,
                               strokeWidth: 2.4,
                             ),
                           )
@@ -433,7 +433,7 @@ class _WalletTopUpSheetState extends State<WalletTopUpSheet> {
                                     : _isMoamalat
                                     ? AppIcons.payment_rounded
                                     : AppIcons.bolt_rounded,
-                                color: Colors.white,
+                                color: AppColors.surface,
                                 size: 22,
                               ),
                               const SizedBox(width: 10),
@@ -446,8 +446,8 @@ class _WalletTopUpSheetState extends State<WalletTopUpSheet> {
                                       : 'شحن المحفظة',
                                   style: GoogleFonts.cairo(
                                     fontSize: 15,
-                                    fontWeight: FontWeight.w800,
-                                    color: Colors.white,
+                                    fontWeight: FontWeight.w600,
+                                    color: AppColors.surface,
                                   ),
                                 ),
                               ),
@@ -493,7 +493,7 @@ class _WalletTopUpSheetState extends State<WalletTopUpSheet> {
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
             decoration: BoxDecoration(
               color: AppColors.surfaceVariant.withValues(alpha: 0.42),
-              borderRadius: BorderRadius.circular(18),
+              borderRadius: BorderRadius.circular(16),
             ),
             child: Column(
               children: <Widget>[
@@ -526,8 +526,8 @@ class _WalletTopUpSheetState extends State<WalletTopUpSheet> {
             width: double.infinity,
             padding: const EdgeInsets.all(13),
             decoration: BoxDecoration(
-              color: AppColors.blush.withValues(alpha: 0.7),
-              borderRadius: BorderRadius.circular(15),
+              color: AppColors.secondary.withValues(alpha: 0.7),
+              borderRadius: BorderRadius.circular(16),
             ),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -599,7 +599,7 @@ class _WalletTopUpSheetState extends State<WalletTopUpSheet> {
           const SizedBox(height: 16),
           InkWell(
             onTap: _pickReceipt,
-            borderRadius: BorderRadius.circular(22),
+            borderRadius: BorderRadius.circular(16),
             child: Ink(
               width: double.infinity,
               padding: const EdgeInsets.all(15),
@@ -607,7 +607,7 @@ class _WalletTopUpSheetState extends State<WalletTopUpSheet> {
                 color: hasReceipt
                     ? AppColors.success.withValues(alpha: 0.1)
                     : AppColors.background,
-                borderRadius: BorderRadius.circular(18),
+                borderRadius: BorderRadius.circular(16),
                 border: Border.all(
                   color: hasReceipt
                       ? AppColors.success.withValues(alpha: 0.5)
@@ -622,8 +622,8 @@ class _WalletTopUpSheetState extends State<WalletTopUpSheet> {
                     decoration: BoxDecoration(
                       color: hasReceipt
                           ? AppColors.success.withValues(alpha: 0.14)
-                          : AppColors.blush,
-                      borderRadius: BorderRadius.circular(14),
+                          : AppColors.secondary,
+                      borderRadius: BorderRadius.circular(16),
                     ),
                     child: Icon(
                       hasReceipt
@@ -645,7 +645,7 @@ class _WalletTopUpSheetState extends State<WalletTopUpSheet> {
                           overflow: TextOverflow.ellipsis,
                           style: GoogleFonts.cairo(
                             fontSize: 13,
-                            fontWeight: FontWeight.w800,
+                            fontWeight: FontWeight.w600,
                             color: AppColors.textPrimary,
                           ),
                         ),
@@ -703,15 +703,15 @@ class _WalletTopUpSheetState extends State<WalletTopUpSheet> {
       filled: true,
       fillColor: AppColors.surfaceVariant.withValues(alpha: 0.45),
       border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(16),
         borderSide: const BorderSide(color: AppColors.divider),
       ),
       enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(16),
         borderSide: const BorderSide(color: AppColors.divider),
       ),
       focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(16),
         borderSide: const BorderSide(color: AppColors.primary, width: 1.4),
       ),
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
@@ -744,16 +744,16 @@ class _SheetHeader extends StatelessWidget {
         Row(
           children: <Widget>[
             Material(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(14),
+              color: AppColors.surface,
+              borderRadius: BorderRadius.circular(16),
               child: InkWell(
                 onTap: onBack,
-                borderRadius: BorderRadius.circular(14),
+                borderRadius: BorderRadius.circular(16),
                 child: Container(
                   width: 42,
                   height: 42,
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(14),
+                    borderRadius: BorderRadius.circular(16),
                     border: Border.all(color: AppColors.divider),
                   ),
                   child: const Icon(
@@ -769,8 +769,8 @@ class _SheetHeader extends StatelessWidget {
               width: 46,
               height: 46,
               decoration: BoxDecoration(
-                color: AppColors.blush,
-                borderRadius: BorderRadius.circular(15),
+                color: AppColors.secondary,
+                borderRadius: BorderRadius.circular(16),
               ),
               child: Icon(
                 isBankTransfer
@@ -795,7 +795,7 @@ class _SheetHeader extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                     style: GoogleFonts.cairo(
                       fontSize: 17,
-                      fontWeight: FontWeight.w800,
+                      fontWeight: FontWeight.w600,
                       color: AppColors.textPrimary,
                     ),
                   ),
@@ -846,7 +846,7 @@ class _QuickAmounts extends StatelessWidget {
             ),
             child: InkWell(
               onTap: () => onSelect(value),
-              borderRadius: BorderRadius.circular(13),
+              borderRadius: BorderRadius.circular(16),
               child: Ink(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 5,
@@ -854,7 +854,7 @@ class _QuickAmounts extends StatelessWidget {
                 ),
                 decoration: BoxDecoration(
                   color: selected ? AppColors.primary : AppColors.background,
-                  borderRadius: BorderRadius.circular(13),
+                  borderRadius: BorderRadius.circular(16),
                   border: Border.all(
                     color: selected ? AppColors.primary : AppColors.divider,
                   ),
@@ -864,8 +864,10 @@ class _QuickAmounts extends StatelessWidget {
                     '${value.toStringAsFixed(0)} د.ل',
                     style: GoogleFonts.cairo(
                       fontSize: 11,
-                      fontWeight: FontWeight.w800,
-                      color: selected ? Colors.white : AppColors.textSecondary,
+                      fontWeight: FontWeight.w600,
+                      color: selected
+                          ? AppColors.surface
+                          : AppColors.textSecondary,
                     ),
                   ),
                 ),
@@ -896,7 +898,7 @@ class _LabeledField extends StatelessWidget {
               title,
               style: GoogleFonts.cairo(
                 fontSize: 14,
-                fontWeight: FontWeight.w700,
+                fontWeight: FontWeight.w600,
                 color: AppColors.textSecondary,
               ),
             ),
@@ -931,8 +933,8 @@ class _SectionCard extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(22),
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(color: AppColors.divider.withValues(alpha: 0.85)),
         boxShadow: const <BoxShadow>[
           BoxShadow(
@@ -968,8 +970,8 @@ class _SectionTitle extends StatelessWidget {
           width: 42,
           height: 42,
           decoration: BoxDecoration(
-            color: AppColors.blush,
-            borderRadius: BorderRadius.circular(14),
+            color: AppColors.secondary,
+            borderRadius: BorderRadius.circular(16),
           ),
           child: Icon(icon, size: 20, color: AppColors.primary),
         ),
@@ -987,7 +989,7 @@ class _SectionTitle extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                       style: GoogleFonts.cairo(
                         fontSize: 14,
-                        fontWeight: FontWeight.w800,
+                        fontWeight: FontWeight.w600,
                         color: AppColors.textPrimary,
                       ),
                     ),
@@ -1007,7 +1009,7 @@ class _SectionTitle extends StatelessWidget {
                         'مطلوب',
                         style: GoogleFonts.cairo(
                           fontSize: 8.5,
-                          fontWeight: FontWeight.w800,
+                          fontWeight: FontWeight.w600,
                           color: AppColors.badge,
                         ),
                       ),
@@ -1055,7 +1057,7 @@ class _PaymentFeature extends StatelessWidget {
           height: 34,
           decoration: BoxDecoration(
             color: AppColors.background,
-            borderRadius: BorderRadius.circular(11),
+            borderRadius: BorderRadius.circular(16),
           ),
           child: Icon(icon, size: 16, color: AppColors.primary),
         ),
@@ -1068,7 +1070,7 @@ class _PaymentFeature extends StatelessWidget {
                 title,
                 style: GoogleFonts.cairo(
                   fontSize: 12,
-                  fontWeight: FontWeight.w700,
+                  fontWeight: FontWeight.w600,
                   color: AppColors.textPrimary,
                 ),
               ),
@@ -1117,7 +1119,7 @@ class _BankDetailRow extends StatelessWidget {
                     label,
                     style: GoogleFonts.cairo(
                       fontSize: 12,
-                      fontWeight: FontWeight.w700,
+                      fontWeight: FontWeight.w600,
                       color: AppColors.textHint,
                     ),
                   ),
@@ -1126,7 +1128,7 @@ class _BankDetailRow extends StatelessWidget {
                     value,
                     style: GoogleFonts.cairo(
                       fontSize: 14,
-                      fontWeight: FontWeight.w800,
+                      fontWeight: FontWeight.w600,
                       color: AppColors.textPrimary,
                     ),
                   ),
@@ -1148,7 +1150,10 @@ class _BankDetailRow extends StatelessWidget {
           ],
         ),
         if (!isLast)
-          Divider(height: 18, color: Colors.black.withValues(alpha: 0.06)),
+          Divider(
+            height: 18,
+            color: AppColors.textPrimary.withValues(alpha: 0.06),
+          ),
       ],
     );
   }

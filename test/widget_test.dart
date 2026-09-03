@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  testWidgets('welcome screen renders its AILA wordmark', (
+  testWidgets('welcome screen renders its LUNORA wordmark', (
     WidgetTester tester,
   ) async {
     await tester.binding.setSurfaceSize(const Size(430, 940));
@@ -18,7 +18,7 @@ void main() {
     );
 
     expect(find.byType(WelcomeScreen), findsOneWidget);
-    expect(find.text('AILA'), findsOneWidget);
+    expect(find.text('LUNORA'), findsOneWidget);
 
     addTearDown(() => tester.binding.setSurfaceSize(null));
   });

@@ -96,10 +96,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
         return Directionality(
           textDirection: TextDirection.rtl,
           child: AlertDialog(
-            backgroundColor: Colors.white,
+            backgroundColor: AppColors.surface,
             surfaceTintColor: Colors.transparent,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(24),
+              borderRadius: BorderRadius.circular(16),
             ),
             icon: Container(
               width: 58,
@@ -119,7 +119,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               textAlign: TextAlign.center,
               style: GoogleFonts.cairo(
                 fontSize: 20,
-                fontWeight: FontWeight.w900,
+                fontWeight: FontWeight.w600,
                 color: AppColors.textPrimary,
               ),
             ),
@@ -142,7 +142,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   'لاحقًا',
                   style: GoogleFonts.cairo(
                     fontSize: 14,
-                    fontWeight: FontWeight.w800,
+                    fontWeight: FontWeight.w600,
                     color: AppColors.textSecondary,
                   ),
                 ),
@@ -154,18 +154,18 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   'تحديد الآن',
                   style: GoogleFonts.cairo(
                     fontSize: 14,
-                    fontWeight: FontWeight.w900,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
                 style: FilledButton.styleFrom(
                   backgroundColor: AppColors.primary,
-                  foregroundColor: Colors.white,
+                  foregroundColor: AppColors.surface,
                   padding: const EdgeInsets.symmetric(
                     horizontal: 18,
                     vertical: 12,
                   ),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14),
+                    borderRadius: BorderRadius.circular(16),
                   ),
                 ),
               ),
@@ -249,18 +249,18 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   'أنشئي حسابكِ',
                   style: GoogleFonts.cairo(
                     fontSize: 28,
-                    fontWeight: FontWeight.w900,
-                    color: AppColors.mauve,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textPrimary,
                     height: 1.2,
                   ),
                 ),
                 const SizedBox(height: 6),
                 Text(
-                  'انضمي إلى تجربة آيلا للجمال الفاخر.',
+                  'انضمي إلى تجربة لونورا للجمال الفاخر.',
                   style: GoogleFonts.cairo(
                     fontSize: 14.5,
                     fontWeight: FontWeight.w500,
-                    color: AppColors.taupe,
+                    color: AppColors.textSecondary,
                   ),
                 ),
                 const SizedBox(height: 22),

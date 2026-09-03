@@ -66,12 +66,12 @@ class _AddressListScreenState extends State<AddressListScreen> {
         child: AlertDialog(
           backgroundColor: AppColors.surface,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(24),
+            borderRadius: BorderRadius.circular(16),
           ),
           title: Text(
             'حذف العنوان',
             style: GoogleFonts.cairo(
-              fontWeight: FontWeight.w800,
+              fontWeight: FontWeight.w600,
               color: AppColors.textPrimary,
             ),
           ),
@@ -93,7 +93,7 @@ class _AddressListScreenState extends State<AddressListScreen> {
                 'حذف',
                 style: GoogleFonts.cairo(
                   color: const Color(0xFFDC2626),
-                  fontWeight: FontWeight.w700,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
             ),
@@ -179,7 +179,7 @@ class _AddressListScreenState extends State<AddressListScreen> {
         physics: const BouncingScrollPhysics(
           parent: AlwaysScrollableScrollPhysics(),
         ),
-        padding: const EdgeInsets.fromLTRB(20, 20, 20, 24),
+        padding: const EdgeInsets.fromLTRB(24, 20, 24, 24),
         itemCount: provider.addresses.length,
         itemBuilder: (context, index) {
           final address = provider.addresses[index];
@@ -208,7 +208,7 @@ class _AddressListScreenState extends State<AddressListScreen> {
   Widget _buildEmpty() {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 32),
+        padding: const EdgeInsets.symmetric(horizontal: 24),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -229,7 +229,7 @@ class _AddressListScreenState extends State<AddressListScreen> {
               child: const Icon(
                 AppIcons.location_on_rounded,
                 size: 52,
-                color: AppColors.roseGold,
+                color: AppColors.accent,
               ),
             ),
             const SizedBox(height: 26),
@@ -239,7 +239,7 @@ class _AddressListScreenState extends State<AddressListScreen> {
               'لا توجد عناوين محفوظة',
               style: GoogleFonts.cairo(
                 fontSize: 19,
-                fontWeight: FontWeight.w800,
+                fontWeight: FontWeight.w600,
                 color: AppColors.textPrimary,
               ),
             ),
@@ -271,7 +271,7 @@ class _AddressListScreenState extends State<AddressListScreen> {
   Widget _buildError(AddressProvider provider) {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 32),
+        padding: const EdgeInsets.symmetric(horizontal: 24),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -309,12 +309,12 @@ class _AddressListScreenState extends State<AddressListScreen> {
                   vertical: 13,
                 ),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(40),
+                  borderRadius: BorderRadius.circular(28),
                 ),
               ),
               child: Text(
                 'إعادة المحاولة',
-                style: GoogleFonts.cairo(fontWeight: FontWeight.w700),
+                style: GoogleFonts.cairo(fontWeight: FontWeight.w600),
               ),
             ),
           ],
@@ -326,8 +326,7 @@ class _AddressListScreenState extends State<AddressListScreen> {
 
 // ─── Header ──────────────────────────────────────────────────────────────────
 
-/// Rose-gradient curved header with circular back button, eyebrow label,
-/// title and a saved-addresses count chip.
+/// Quiet Aura header with a compact navigation control and count chip.
 class _AddressHeader extends StatelessWidget {
   final String title;
   final int? count;
@@ -345,98 +344,70 @@ class _AddressHeader extends StatelessWidget {
 
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.fromLTRB(20, topPad + 14, 20, 26),
-      decoration: const BoxDecoration(
-        gradient: AppColors.roseGradient,
-        borderRadius: BorderRadius.only(
-          bottomLeft: Radius.circular(36),
-          bottomRight: Radius.circular(36),
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.shadowSoft,
-            blurRadius: 28,
-            offset: Offset(0, 14),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      padding: EdgeInsets.fromLTRB(24, topPad + 24, 24, 12),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Row(
-            children: [
-              _CircleButton(
-                icon: AppIcons.arrow_back_ios_new_rounded,
-                onTap: onBack,
-              ),
-              const Spacer(),
-              const AilaWordmark(fontSize: 20, color: Colors.white),
-              const Spacer(),
-              const SizedBox(width: 42),
-            ],
+          _CircleButton(
+            icon: AppIcons.arrow_back_ios_new_rounded,
+            onTap: onBack,
           ),
-          const SizedBox(height: 18),
-          Text(
-            'DELIVERY',
-            style: GoogleFonts.cairo(
-              fontSize: 10.5,
-              fontWeight: FontWeight.w600,
-              letterSpacing: 3,
-              color: Colors.white.withValues(alpha: 0.85),
-            ),
-          ),
-          const SizedBox(height: 4),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Expanded(
-                child: Text(
-                  title,
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'DELIVERY',
                   style: GoogleFonts.cairo(
-                    fontSize: 24,
-                    fontWeight: FontWeight.w800,
-                    color: Colors.white,
-                    height: 1.1,
+                    fontSize: 10,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: 2.4,
+                    color: AppColors.textSecondary,
                   ),
                 ),
-              ),
-              if (count != null) ...[
-                const SizedBox(width: 12),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 14,
-                    vertical: 7,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.18),
-                    borderRadius: BorderRadius.circular(40),
-                    border: Border.all(
-                      color: Colors.white.withValues(alpha: 0.28),
-                    ),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Icon(
-                        AppIcons.location_on_rounded,
-                        size: 14,
-                        color: Colors.white,
-                      ),
-                      const SizedBox(width: 5),
-                      Text(
-                        '$count',
-                        style: GoogleFonts.cairo(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w800,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ],
+                const SizedBox(height: 3),
+                Text(
+                  title,
+                  style: GoogleFonts.cairo(
+                    fontSize: 21,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textPrimary,
+                    height: 1.2,
                   ),
                 ),
               ],
-            ],
+            ),
           ),
+          if (count != null) ...[
+            const SizedBox(width: 12),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+              decoration: BoxDecoration(
+                color: AppColors.secondary,
+                borderRadius: BorderRadius.circular(999),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(
+                    AppIcons.location_on_rounded,
+                    size: 14,
+                    color: AppColors.primary,
+                  ),
+                  const SizedBox(width: 5),
+                  Text(
+                    '$count',
+                    style: GoogleFonts.cairo(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.primary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ],
       ),
     );
@@ -452,16 +423,16 @@ class _CircleButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: Colors.white,
-      shape: const CircleBorder(),
+      color: AppColors.surface,
+      shape: CircleBorder(side: BorderSide(color: AppColors.divider)),
       child: InkWell(
         onTap: onTap,
         customBorder: const CircleBorder(),
         child: Container(
-          width: 42,
-          height: 42,
+          width: 40,
+          height: 40,
           alignment: Alignment.center,
-          child: Icon(icon, size: 20, color: AppColors.roseGold),
+          child: Icon(icon, size: 19, color: AppColors.textPrimary),
         ),
       ),
     );
@@ -495,7 +466,7 @@ class _BottomAddBar extends StatelessWidget {
       child: SafeArea(
         top: false,
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(20, 14, 20, 14),
+          padding: const EdgeInsets.fromLTRB(24, 14, 24, 14),
           child: AilaGradientButton(
             label: 'إضافة عنوان جديد',
             icon: AppIcons.add_location_alt_rounded,
@@ -540,7 +511,7 @@ class _AddressCard extends StatelessWidget {
     final card = Container(
       decoration: BoxDecoration(
         color: AppColors.surface,
-        borderRadius: BorderRadius.circular(22),
+        borderRadius: BorderRadius.circular(16),
       ),
       padding: const EdgeInsetsDirectional.fromSTEB(16, 16, 16, 14),
       child: Column(
@@ -569,7 +540,7 @@ class _AddressCard extends StatelessWidget {
                             overflow: TextOverflow.ellipsis,
                             style: GoogleFonts.cairo(
                               fontSize: 16.5,
-                              fontWeight: FontWeight.w800,
+                              fontWeight: FontWeight.w600,
                               color: AppColors.textPrimary,
                               height: 1.2,
                             ),
@@ -622,7 +593,7 @@ class _AddressCard extends StatelessWidget {
           ),
           if (!selectionMode) ...[
             const SizedBox(height: 14),
-            Divider(height: 1, thickness: 1, color: AppColors.blush),
+            Divider(height: 1, thickness: 1, color: AppColors.secondary),
             const SizedBox(height: 10),
             Row(
               children: [
@@ -641,7 +612,7 @@ class _AddressCard extends StatelessWidget {
                         'العنوان الافتراضي',
                         style: GoogleFonts.cairo(
                           fontSize: 12.5,
-                          fontWeight: FontWeight.w700,
+                          fontWeight: FontWeight.w600,
                           color: AppColors.success,
                         ),
                       ),
@@ -650,8 +621,8 @@ class _AddressCard extends StatelessWidget {
                 const Spacer(),
                 _IconAction(
                   icon: AppIcons.edit_outlined,
-                  color: AppColors.roseGold,
-                  bg: AppColors.blush,
+                  color: AppColors.accent,
+                  bg: AppColors.secondary,
                   tooltip: 'تعديل',
                   onTap: onEdit,
                 ),
@@ -675,7 +646,7 @@ class _AddressCard extends StatelessWidget {
       child: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(highlighted ? 23.5 : 22),
-          gradient: highlighted ? AppColors.roseGradient : null,
+          gradient: highlighted ? AppColors.primaryGradient : null,
           color: highlighted ? null : AppColors.surface,
           boxShadow: [
             BoxShadow(
@@ -688,10 +659,10 @@ class _AddressCard extends StatelessWidget {
         padding: highlighted ? const EdgeInsets.all(1.6) : EdgeInsets.zero,
         child: Material(
           color: Colors.transparent,
-          borderRadius: BorderRadius.circular(22),
+          borderRadius: BorderRadius.circular(16),
           child: InkWell(
             onTap: onTap,
-            borderRadius: BorderRadius.circular(22),
+            borderRadius: BorderRadius.circular(16),
             child: card,
           ),
         ),
@@ -726,14 +697,14 @@ class _LabelBadge extends StatelessWidget {
       width: 50,
       height: 50,
       decoration: BoxDecoration(
-        gradient: highlighted ? AppColors.roseGradient : null,
+        gradient: highlighted ? AppColors.primaryGradient : null,
         color: highlighted ? null : AppColors.surfaceVariant,
         borderRadius: BorderRadius.circular(16),
       ),
       alignment: Alignment.center,
       child: Icon(
         _labelIcon(title),
-        color: highlighted ? Colors.white : AppColors.roseGold,
+        color: highlighted ? AppColors.surface : AppColors.accent,
         size: 23,
       ),
     );
@@ -759,24 +730,20 @@ class _DefaultBadge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: AppColors.blush,
-        borderRadius: BorderRadius.circular(40),
+        color: AppColors.secondary,
+        borderRadius: BorderRadius.circular(28),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Icon(
-            AppIcons.star_rounded,
-            size: 12,
-            color: AppColors.roseGold,
-          ),
+          const Icon(AppIcons.star_rounded, size: 12, color: AppColors.accent),
           const SizedBox(width: 4),
           Text(
             'افتراضي',
             style: GoogleFonts.cairo(
               fontSize: 10.5,
-              fontWeight: FontWeight.w800,
-              color: AppColors.roseGold,
+              fontWeight: FontWeight.w600,
+              color: AppColors.accent,
             ),
           ),
         ],
@@ -796,7 +763,7 @@ class _SelectionIndicator extends StatelessWidget {
       width: 26,
       height: 26,
       decoration: BoxDecoration(
-        gradient: selected ? AppColors.roseGradient : null,
+        gradient: selected ? AppColors.primaryGradient : null,
         shape: BoxShape.circle,
         border: selected
             ? null
@@ -804,7 +771,11 @@ class _SelectionIndicator extends StatelessWidget {
       ),
       alignment: Alignment.center,
       child: selected
-          ? const Icon(AppIcons.check_rounded, size: 15, color: Colors.white)
+          ? const Icon(
+              AppIcons.check_rounded,
+              size: 15,
+              color: AppColors.surface,
+            )
           : null,
     );
   }
@@ -819,15 +790,15 @@ class _SetDefaultChip extends StatelessWidget {
   Widget build(BuildContext context) {
     return Material(
       color: Colors.transparent,
-      borderRadius: BorderRadius.circular(40),
+      borderRadius: BorderRadius.circular(28),
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(40),
+        borderRadius: BorderRadius.circular(28),
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
           decoration: BoxDecoration(
             color: AppColors.surfaceVariant,
-            borderRadius: BorderRadius.circular(40),
+            borderRadius: BorderRadius.circular(28),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
@@ -835,15 +806,15 @@ class _SetDefaultChip extends StatelessWidget {
               const Icon(
                 AppIcons.star_border_rounded,
                 size: 15,
-                color: AppColors.roseGold,
+                color: AppColors.accent,
               ),
               const SizedBox(width: 6),
               Text(
                 'تعيين كافتراضي',
                 style: GoogleFonts.cairo(
                   fontSize: 12.5,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.roseGold,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.accent,
                 ),
               ),
             ],
@@ -875,10 +846,10 @@ class _IconAction extends StatelessWidget {
       message: tooltip,
       child: Material(
         color: bg,
-        borderRadius: BorderRadius.circular(13),
+        borderRadius: BorderRadius.circular(16),
         child: InkWell(
           onTap: onTap,
-          borderRadius: BorderRadius.circular(13),
+          borderRadius: BorderRadius.circular(16),
           child: Container(
             width: 38,
             height: 38,

@@ -104,7 +104,7 @@ class _ToastWidgetState extends State<_ToastWidget>
 
   @override
   Widget build(BuildContext context) {
-    final accent = widget.isSuccess ? AppColors.success : AppColors.badge;
+    final accent = widget.isSuccess ? AppColors.success : AppColors.error;
     final icon = widget.isSuccess
         ? AppIcons.check_circle_rounded
         : AppIcons.error_rounded;
@@ -162,7 +162,7 @@ class _ToastWidgetState extends State<_ToastWidget>
                           style: GoogleFonts.cairo(
                             color: AppColors.mauve,
                             fontSize: 13.5,
-                            fontWeight: FontWeight.w700,
+                            fontWeight: FontWeight.w600,
                             height: 1.45,
                           ),
                         ),

@@ -129,7 +129,7 @@ class _WalletTransactionsScreenState extends State<WalletTransactionsScreen> {
                 )
               else
                 SliverPadding(
-                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 100),
+                  padding: const EdgeInsets.fromLTRB(24, 0, 24, 100),
                   sliver: SliverList(
                     delegate: SliverChildBuilderDelegate(
                       (context, i) {
@@ -171,7 +171,7 @@ class _WalletTransactionsScreenState extends State<WalletTransactionsScreen> {
     final hasActiveFilter = _selectedType != null || _selectedStatus != null;
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 16, 20, 12),
+      padding: const EdgeInsets.fromLTRB(24, 16, 24, 12),
       child: Row(
         children: [
           // Search input
@@ -179,8 +179,8 @@ class _WalletTransactionsScreenState extends State<WalletTransactionsScreen> {
             child: Container(
               height: 50,
               decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(30), // Fully circular
+                color: AppColors.surface,
+                borderRadius: BorderRadius.circular(28), // Fully circular
                 boxShadow: [
                   BoxShadow(
                     color: AppColors.shadowCard,
@@ -238,8 +238,8 @@ class _WalletTransactionsScreenState extends State<WalletTransactionsScreen> {
               width: 50,
               height: 50,
               decoration: BoxDecoration(
-                color: hasActiveFilter ? AppColors.primary : Colors.white,
-                borderRadius: BorderRadius.circular(30), // Fully circular
+                color: hasActiveFilter ? AppColors.primary : AppColors.surface,
+                borderRadius: BorderRadius.circular(28), // Fully circular
                 boxShadow: [
                   BoxShadow(
                     color: AppColors.shadowCard,
@@ -251,7 +251,7 @@ class _WalletTransactionsScreenState extends State<WalletTransactionsScreen> {
               child: Icon(
                 AppIcons.tune_rounded,
                 color: hasActiveFilter
-                    ? Colors.white
+                    ? AppColors.surface
                     : AppColors.textHint.withValues(alpha: 0.6),
                 size: 22,
               ),
@@ -265,13 +265,7 @@ class _WalletTransactionsScreenState extends State<WalletTransactionsScreen> {
   Widget _buildHeader(BuildContext context) {
     return Container(
       width: double.infinity,
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          colors: [AppColors.mauve, AppColors.roseGold, AppColors.rosePink],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-      ),
+      decoration: const BoxDecoration(color: AppColors.primary),
       child: Stack(
         clipBehavior: Clip.none,
         children: [
@@ -303,13 +297,13 @@ class _WalletTransactionsScreenState extends State<WalletTransactionsScreen> {
                     width: 42,
                     height: 42,
                     decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.15),
+                      color: AppColors.surface.withValues(alpha: 0.15),
                       shape: BoxShape.circle,
                     ),
                     child: IconButton(
                       icon: const Icon(
                         AppIcons.arrow_back_rounded,
-                        color: Colors.white,
+                        color: AppColors.surface,
                         size: 20,
                       ),
                       onPressed: () => Navigator.pop(context),
@@ -319,8 +313,8 @@ class _WalletTransactionsScreenState extends State<WalletTransactionsScreen> {
                     'جميع الحركات',
                     style: GoogleFonts.cairo(
                       fontSize: 18,
-                      color: Colors.white,
-                      fontWeight: FontWeight.w700,
+                      color: AppColors.surface,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
                   const SizedBox(width: 42),
@@ -373,20 +367,20 @@ class _TransactionTile extends StatelessWidget {
     final isDeposit = transaction.isDeposit;
     final color = isDeposit ? AppColors.primary : AppColors.textPrimary;
     final iconBgColor = transaction.isWithdrawal
-        ? AppColors.mauve
-        : AppColors.blush;
+        ? AppColors.textPrimary
+        : AppColors.secondary;
     final iconColor = transaction.isWithdrawal
-        ? Colors.white
+        ? AppColors.surface
         : AppColors.primary;
 
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surface,
         borderRadius: BorderRadius.only(
-          topLeft: isFirst ? const Radius.circular(24) : Radius.zero,
-          topRight: isFirst ? const Radius.circular(24) : Radius.zero,
-          bottomLeft: isLast ? const Radius.circular(24) : Radius.zero,
-          bottomRight: isLast ? const Radius.circular(24) : Radius.zero,
+          topLeft: isFirst ? const Radius.circular(16) : Radius.zero,
+          topRight: isFirst ? const Radius.circular(16) : Radius.zero,
+          bottomLeft: isLast ? const Radius.circular(16) : Radius.zero,
+          bottomRight: isLast ? const Radius.circular(16) : Radius.zero,
         ),
         boxShadow: isLast
             ? [
@@ -431,7 +425,7 @@ class _TransactionTile extends StatelessWidget {
                             transaction.typeLabel,
                             style: GoogleFonts.cairo(
                               fontSize: 14,
-                              fontWeight: FontWeight.w700,
+                              fontWeight: FontWeight.w600,
                               color: AppColors.textPrimary,
                             ),
                             maxLines: 1,
@@ -457,7 +451,7 @@ class _TransactionTile extends StatelessWidget {
                           '${isDeposit ? '+' : '-'} د.ل ${transaction.amount.toStringAsFixed(0)}',
                           style: GoogleFonts.cairo(
                             fontSize: 16,
-                            fontWeight: FontWeight.w800,
+                            fontWeight: FontWeight.w600,
                             color: color,
                           ),
                         ),
@@ -469,7 +463,7 @@ class _TransactionTile extends StatelessWidget {
                               textAlign: TextAlign.end,
                               style: GoogleFonts.cairo(
                                 fontSize: 10,
-                                fontWeight: FontWeight.w700,
+                                fontWeight: FontWeight.w600,
                                 color: transaction.isPending
                                     ? const Color(0xFFD97706)
                                     : const Color(0xFFDC2626),
@@ -491,14 +485,14 @@ class _TransactionTile extends StatelessWidget {
                     ),
                     decoration: BoxDecoration(
                       color: const Color(0xFFFEF2F2),
-                      borderRadius: BorderRadius.circular(14),
+                      borderRadius: BorderRadius.circular(16),
                       border: Border.all(color: const Color(0xFFFECACA)),
                     ),
                     child: Text(
                       'سبب الرفض: ${transaction.bankTransferRejectionReason!}',
                       style: GoogleFonts.cairo(
                         fontSize: 12,
-                        fontWeight: FontWeight.w700,
+                        fontWeight: FontWeight.w600,
                         color: const Color(0xFFB91C1C),
                       ),
                     ),
@@ -555,7 +549,7 @@ class _WalletFilterSheetState extends State<_WalletFilterSheet> {
   Widget build(BuildContext context) {
     return Container(
       decoration: const BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surface,
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(32),
           topRight: Radius.circular(32),
@@ -581,7 +575,7 @@ class _WalletFilterSheetState extends State<_WalletFilterSheet> {
             'تصفية الحركات',
             style: GoogleFonts.cairo(
               fontSize: 18,
-              fontWeight: FontWeight.w800,
+              fontWeight: FontWeight.w600,
               color: AppColors.textPrimary,
             ),
           ),
@@ -590,7 +584,7 @@ class _WalletFilterSheetState extends State<_WalletFilterSheet> {
             'نوع الحركة',
             style: GoogleFonts.cairo(
               fontSize: 14,
-              fontWeight: FontWeight.w700,
+              fontWeight: FontWeight.w600,
               color: AppColors.textSecondary,
             ),
           ),
@@ -624,7 +618,7 @@ class _WalletFilterSheetState extends State<_WalletFilterSheet> {
             'الحالة',
             style: GoogleFonts.cairo(
               fontSize: 14,
-              fontWeight: FontWeight.w700,
+              fontWeight: FontWeight.w600,
               color: AppColors.textSecondary,
             ),
           ),
@@ -695,7 +689,7 @@ class _WalletFilterSheetState extends State<_WalletFilterSheet> {
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
-                    foregroundColor: Colors.white,
+                    foregroundColor: AppColors.surface,
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
@@ -705,7 +699,7 @@ class _WalletFilterSheetState extends State<_WalletFilterSheet> {
                     'تطبيق الفلتر',
                     style: GoogleFonts.cairo(
                       fontSize: 14,
-                      fontWeight: FontWeight.w700,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
                 ),
@@ -731,14 +725,14 @@ class _WalletFilterSheetState extends State<_WalletFilterSheet> {
         padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
         decoration: BoxDecoration(
           color: isSelected ? AppColors.primary : AppColors.surfaceVariant,
-          borderRadius: BorderRadius.circular(30),
+          borderRadius: BorderRadius.circular(28),
         ),
         child: Text(
           label,
           style: GoogleFonts.cairo(
             fontSize: 13,
             fontWeight: FontWeight.w600,
-            color: isSelected ? Colors.white : AppColors.textSecondary,
+            color: isSelected ? AppColors.surface : AppColors.textSecondary,
           ),
         ),
       ),

@@ -467,14 +467,14 @@ class _AddressMapScreenState extends State<AddressMapScreen> {
                 right: 0,
                 child: LinearProgressIndicator(
                   backgroundColor: Colors.transparent,
-                  color: AppColors.roseGold,
+                  color: AppColors.accent,
                 ),
               ),
             SafeArea(
               child: Column(
                 children: [
                   Padding(
-                    padding: const EdgeInsets.fromLTRB(15, 12, 15, 0),
+                    padding: const EdgeInsets.fromLTRB(24, 12, 24, 0),
                     child: Row(
                       children: [
                         _circleBtn(
@@ -500,7 +500,7 @@ class _AddressMapScreenState extends State<AddressMapScreen> {
                 AppIcons.my_location_rounded,
                 _goToMyLocation,
                 color: AppColors.primary,
-                iconColor: Colors.white,
+                iconColor: AppColors.surface,
               ),
             ),
             if (_markerPosition == null && !provider.isLoadingConfig)
@@ -517,9 +517,9 @@ class _AddressMapScreenState extends State<AddressMapScreen> {
     return Container(
       height: 52,
       decoration: BoxDecoration(
-        color: AppColors.pearl.withValues(alpha: 0.97),
+        color: AppColors.background.withValues(alpha: 0.97),
         borderRadius: BorderRadius.circular(999),
-        border: Border.all(color: AppColors.rosePink.withValues(alpha: 0.24)),
+        border: Border.all(color: AppColors.neutral.withValues(alpha: 0.24)),
         boxShadow: [
           BoxShadow(
             color: AppColors.shadowCard,
@@ -538,14 +538,14 @@ class _AddressMapScreenState extends State<AddressMapScreen> {
         style: GoogleFonts.cairo(
           fontSize: 13.5,
           fontWeight: FontWeight.w500,
-          color: AppColors.mauve,
+          color: AppColors.textPrimary,
         ),
         decoration: InputDecoration(
           hintText: 'ابحث عن موقع أو عنوان...',
           hintStyle: GoogleFonts.cairo(fontSize: 13, color: AppColors.textHint),
           prefixIcon: const Icon(
             AppIcons.search_rounded,
-            color: AppColors.roseGold,
+            color: AppColors.accent,
             size: 20,
           ),
           suffixIcon: _searchCtrl.text.isNotEmpty
@@ -570,12 +570,12 @@ class _AddressMapScreenState extends State<AddressMapScreen> {
 
   Widget _predictionsDropdown() {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(15, 8, 63, 0),
+      padding: const EdgeInsets.fromLTRB(24, 8, 72, 0),
       child: Container(
         constraints: const BoxConstraints(maxHeight: 240),
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(24),
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(16),
           border: Border.all(color: AppColors.divider),
           boxShadow: [
             BoxShadow(
@@ -603,7 +603,7 @@ class _AddressMapScreenState extends State<AddressMapScreen> {
               leading: const Icon(
                 AppIcons.location_on_outlined,
                 size: 18,
-                color: AppColors.roseGold,
+                color: AppColors.accent,
               ),
               title: Text(
                 prediction.mainText,
@@ -614,7 +614,10 @@ class _AddressMapScreenState extends State<AddressMapScreen> {
               ),
               subtitle: Text(
                 prediction.secondaryText,
-                style: GoogleFonts.cairo(fontSize: 11, color: AppColors.taupe),
+                style: GoogleFonts.cairo(
+                  fontSize: 11,
+                  color: AppColors.textSecondary,
+                ),
               ),
               onTap: () => _onPredictionSelected(prediction),
             );
@@ -634,10 +637,10 @@ class _AddressMapScreenState extends State<AddressMapScreen> {
             margin: const EdgeInsets.symmetric(horizontal: 24),
             padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
             decoration: BoxDecoration(
-              color: AppColors.pearl.withValues(alpha: 0.96),
+              color: AppColors.background.withValues(alpha: 0.96),
               borderRadius: BorderRadius.circular(999),
               border: Border.all(
-                color: AppColors.rosePink.withValues(alpha: 0.2),
+                color: AppColors.neutral.withValues(alpha: 0.2),
               ),
               boxShadow: [
                 BoxShadow(
@@ -652,7 +655,7 @@ class _AddressMapScreenState extends State<AddressMapScreen> {
               children: [
                 const Icon(
                   AppIcons.touch_app_rounded,
-                  color: AppColors.roseGold,
+                  color: AppColors.accent,
                   size: 20,
                 ),
                 const SizedBox(width: 8),
@@ -661,7 +664,7 @@ class _AddressMapScreenState extends State<AddressMapScreen> {
                   style: GoogleFonts.cairo(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
-                    color: AppColors.mauve,
+                    color: AppColors.textPrimary,
                   ),
                 ),
               ],
@@ -683,8 +686,8 @@ class _AddressMapScreenState extends State<AddressMapScreen> {
       snapSizes: const <double>[0.24, 0.56, 0.9],
       builder: (_, scrollController) => Container(
         decoration: const BoxDecoration(
-          color: AppColors.pearl,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(34)),
+          color: AppColors.background,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
           boxShadow: [
             BoxShadow(
               color: AppColors.shadowFloat,
@@ -695,7 +698,7 @@ class _AddressMapScreenState extends State<AddressMapScreen> {
         ),
         child: SingleChildScrollView(
           controller: scrollController,
-          padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
+          padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
           child: Form(
             key: _formKey,
             child: Column(
@@ -707,7 +710,7 @@ class _AddressMapScreenState extends State<AddressMapScreen> {
                     height: 4,
                     margin: const EdgeInsets.only(top: 12, bottom: 14),
                     decoration: BoxDecoration(
-                      color: AppColors.rosePink.withValues(alpha: 0.4),
+                      color: AppColors.neutral.withValues(alpha: 0.4),
                       borderRadius: BorderRadius.circular(2),
                     ),
                   ),
@@ -718,8 +721,8 @@ class _AddressMapScreenState extends State<AddressMapScreen> {
                       : 'تفاصيل عنوان التوصيل',
                   style: GoogleFonts.cairo(
                     fontSize: 18,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.mauve,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 3),
@@ -728,7 +731,7 @@ class _AddressMapScreenState extends State<AddressMapScreen> {
                   style: GoogleFonts.cairo(
                     fontSize: 12,
                     height: 1.5,
-                    color: AppColors.taupe,
+                    color: AppColors.textSecondary,
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -737,8 +740,8 @@ class _AddressMapScreenState extends State<AddressMapScreen> {
                     width: double.infinity,
                     padding: const EdgeInsets.all(15),
                     decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(20),
+                      color: AppColors.surface,
+                      borderRadius: BorderRadius.circular(16),
                       border: Border.all(color: AppColors.divider),
                       boxShadow: const [
                         BoxShadow(
@@ -752,7 +755,7 @@ class _AddressMapScreenState extends State<AddressMapScreen> {
                       children: [
                         const Icon(
                           AppIcons.location_on_rounded,
-                          color: AppColors.roseGold,
+                          color: AppColors.accent,
                           size: 20,
                         ),
                         const SizedBox(width: 10),
@@ -761,7 +764,7 @@ class _AddressMapScreenState extends State<AddressMapScreen> {
                             _resolvedAddress,
                             style: GoogleFonts.cairo(
                               fontSize: 13,
-                              color: AppColors.mauve,
+                              color: AppColors.textPrimary,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
@@ -809,7 +812,7 @@ class _AddressMapScreenState extends State<AddressMapScreen> {
                 ],
                 if (provider.isEstimating) ...[
                   const SizedBox(height: 12),
-                  const LinearProgressIndicator(color: AppColors.roseGold),
+                  const LinearProgressIndicator(color: AppColors.accent),
                 ] else if (provider.routeEstimate != null) ...[
                   const SizedBox(height: 12),
                   Wrap(
@@ -863,7 +866,7 @@ class _AddressMapScreenState extends State<AddressMapScreen> {
                         borderRadius: BorderRadius.circular(999),
                         child: Ink(
                           decoration: const BoxDecoration(
-                            gradient: AppColors.roseGradient,
+                            gradient: AppColors.primaryGradient,
                             borderRadius: BorderRadius.all(
                               Radius.circular(999),
                             ),
@@ -881,7 +884,7 @@ class _AddressMapScreenState extends State<AddressMapScreen> {
                                     width: 22,
                                     height: 22,
                                     child: CircularProgressIndicator(
-                                      color: Colors.white,
+                                      color: AppColors.surface,
                                       strokeWidth: 2.5,
                                     ),
                                   )
@@ -891,8 +894,8 @@ class _AddressMapScreenState extends State<AddressMapScreen> {
                                         : 'حفظ العنوان',
                                     style: GoogleFonts.cairo(
                                       fontSize: 15,
-                                      fontWeight: FontWeight.w700,
-                                      color: Colors.white,
+                                      fontWeight: FontWeight.w600,
+                                      color: AppColors.surface,
                                     ),
                                   ),
                           ),
@@ -928,20 +931,20 @@ class _AddressMapScreenState extends State<AddressMapScreen> {
 
     final badgeColor = _isOutsideMisrata
         ? const Color(0xFF92400E)
-        : AppColors.roseGold;
+        : AppColors.accent;
     final badgeBg = _isOutsideMisrata
         ? const Color(0xFFFFF7ED)
-        : AppColors.blush;
+        : AppColors.secondary;
     final badgeBorder = _isOutsideMisrata
         ? const Color(0xFFFCD34D)
-        : AppColors.rosePink;
+        : AppColors.neutral;
 
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: _isOutsideMisrata ? const Color(0xFFFFFBEB) : Colors.white,
-        borderRadius: BorderRadius.circular(20),
+        color: _isOutsideMisrata ? const Color(0xFFFFFBEB) : AppColors.surface,
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: _isOutsideMisrata
               ? const Color(0xFFFDE68A)
@@ -970,8 +973,8 @@ class _AddressMapScreenState extends State<AddressMapScreen> {
                           : 'سيتم تحديد المدينة من الموقع',
                       style: GoogleFonts.cairo(
                         fontSize: 14,
-                        fontWeight: FontWeight.w800,
-                        color: AppColors.mauve,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.textPrimary,
                       ),
                     ),
                     const SizedBox(height: 4),
@@ -980,7 +983,7 @@ class _AddressMapScreenState extends State<AddressMapScreen> {
                       style: GoogleFonts.cairo(
                         fontSize: 12,
                         height: 1.6,
-                        color: AppColors.taupe,
+                        color: AppColors.textSecondary,
                       ),
                     ),
                   ],
@@ -1000,7 +1003,7 @@ class _AddressMapScreenState extends State<AddressMapScreen> {
                   badgeText,
                   style: GoogleFonts.cairo(
                     fontSize: 11,
-                    fontWeight: FontWeight.w800,
+                    fontWeight: FontWeight.w600,
                     color: badgeColor,
                   ),
                 ),
@@ -1013,8 +1016,8 @@ class _AddressMapScreenState extends State<AddressMapScreen> {
               'سعر التوصيل لهذه المدينة: ${selectedCityConfig.shippingCost.toStringAsFixed(0)} د.ل',
               style: GoogleFonts.cairo(
                 fontSize: 12,
-                fontWeight: FontWeight.w700,
-                color: AppColors.roseGold,
+                fontWeight: FontWeight.w600,
+                color: AppColors.accent,
               ),
             ),
           ],
@@ -1026,7 +1029,7 @@ class _AddressMapScreenState extends State<AddressMapScreen> {
   Widget _circleBtn(
     IconData icon,
     VoidCallback onTap, {
-    Color color = Colors.white,
+    Color color = AppColors.surface,
     Color iconColor = AppColors.textPrimary,
   }) {
     return Material(
@@ -1043,8 +1046,8 @@ class _AddressMapScreenState extends State<AddressMapScreen> {
             color: color,
             shape: BoxShape.circle,
             border: Border.all(
-              color: color == Colors.white
-                  ? AppColors.rosePink.withValues(alpha: 0.2)
+              color: color == AppColors.surface
+                  ? AppColors.neutral.withValues(alpha: 0.2)
                   : Colors.transparent,
             ),
             boxShadow: const [
@@ -1065,21 +1068,21 @@ class _AddressMapScreenState extends State<AddressMapScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
-        color: AppColors.blush,
+        color: AppColors.secondary,
         borderRadius: BorderRadius.circular(999),
-        border: Border.all(color: AppColors.rosePink.withValues(alpha: 0.22)),
+        border: Border.all(color: AppColors.neutral.withValues(alpha: 0.22)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 14, color: AppColors.roseGold),
+          Icon(icon, size: 14, color: AppColors.accent),
           const SizedBox(width: 4),
           Text(
             text,
             style: GoogleFonts.cairo(
               fontSize: 12,
-              color: AppColors.roseGold,
-              fontWeight: FontWeight.w700,
+              color: AppColors.accent,
+              fontWeight: FontWeight.w600,
             ),
           ),
         ],
@@ -1101,7 +1104,7 @@ class _AddressMapScreenState extends State<AddressMapScreen> {
       maxLines: maxLines,
       validator: validator,
       textDirection: TextDirection.rtl,
-      style: GoogleFonts.cairo(fontSize: 14, color: AppColors.mauve),
+      style: GoogleFonts.cairo(fontSize: 14, color: AppColors.textPrimary),
       decoration: _inputDecoration(label, icon),
     );
   }
@@ -1116,25 +1119,25 @@ class _AddressMapScreenState extends State<AddressMapScreen> {
       ),
       prefixIcon: Icon(icon, color: AppColors.textHint, size: 20),
       filled: true,
-      fillColor: Colors.white,
+      fillColor: AppColors.surface,
       border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(16),
         borderSide: const BorderSide(color: AppColors.divider),
       ),
       enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(16),
         borderSide: const BorderSide(color: AppColors.divider),
       ),
       focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(18),
-        borderSide: const BorderSide(color: AppColors.roseGold, width: 1.5),
+        borderRadius: BorderRadius.circular(16),
+        borderSide: const BorderSide(color: AppColors.accent, width: 1.5),
       ),
       errorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(16),
         borderSide: const BorderSide(color: Color(0xFFDC2626), width: 1.5),
       ),
       focusedErrorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(16),
         borderSide: const BorderSide(color: Color(0xFFDC2626), width: 1.5),
       ),
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),

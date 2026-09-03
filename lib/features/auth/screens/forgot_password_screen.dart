@@ -189,7 +189,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
           'استعادة كلمة المرور',
           style: GoogleFonts.cairo(
             fontSize: 18,
-            fontWeight: FontWeight.w900,
+            fontWeight: FontWeight.w600,
             color: AppColors.textPrimary,
           ),
         ),
@@ -207,7 +207,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                 _title,
                 style: GoogleFonts.cairo(
                   fontSize: 24,
-                  fontWeight: FontWeight.w900,
+                  fontWeight: FontWeight.w600,
                   color: AppColors.textPrimary,
                   height: 1.2,
                 ),
@@ -242,7 +242,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                       'إعادة إرسال الرمز',
                       style: GoogleFonts.cairo(
                         fontSize: 14,
-                        fontWeight: FontWeight.w800,
+                        fontWeight: FontWeight.w600,
                         color: AppColors.primary,
                       ),
                     ),
@@ -409,14 +409,14 @@ class _ResetTextField extends StatelessWidget {
           label,
           style: GoogleFonts.cairo(
             fontSize: 14,
-            fontWeight: FontWeight.w800,
+            fontWeight: FontWeight.w600,
             color: AppColors.textPrimary,
           ),
         ),
         const SizedBox(height: 8),
         Container(
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: AppColors.surface,
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
               color: AppColors.primary.withValues(alpha: 0.12),
@@ -438,7 +438,7 @@ class _ResetTextField extends StatelessWidget {
             textInputAction: TextInputAction.next,
             style: GoogleFonts.cairo(
               fontSize: 15,
-              fontWeight: FontWeight.w700,
+              fontWeight: FontWeight.w600,
               color: AppColors.textPrimary,
             ),
             decoration: InputDecoration(
@@ -494,11 +494,11 @@ class _ResetPrimaryButton extends StatelessWidget {
         onPressed: isLoading ? null : onPressed,
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.primary,
-          foregroundColor: Colors.white,
+          foregroundColor: AppColors.surface,
           disabledBackgroundColor: AppColors.primary.withValues(alpha: 0.55),
           elevation: 0,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(18),
+            borderRadius: BorderRadius.circular(16),
           ),
         ),
         child: isLoading
@@ -507,14 +507,14 @@ class _ResetPrimaryButton extends StatelessWidget {
                 height: 22,
                 child: CircularProgressIndicator(
                   strokeWidth: 2.4,
-                  color: Colors.white,
+                  color: AppColors.surface,
                 ),
               )
             : Text(
                 text,
                 style: GoogleFonts.cairo(
                   fontSize: 16,
-                  fontWeight: FontWeight.w900,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
       ),

@@ -4,7 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_icons.dart';
 
-/// AILA / Lovable auth input field — a soft rounded card with a leading
+/// LUNORA / Lovable auth input field — a soft rounded card with a leading
 /// rose-gold icon and an inline placeholder (no separate label).
 class AuthField extends StatefulWidget {
   final TextEditingController controller;
@@ -37,8 +37,8 @@ class _AuthFieldState extends State<AuthField> {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(color: AppColors.divider),
         boxShadow: const [
           BoxShadow(
@@ -51,7 +51,7 @@ class _AuthFieldState extends State<AuthField> {
       child: Row(
         children: [
           const SizedBox(width: 16),
-          Icon(widget.icon, size: 19, color: AppColors.roseGold),
+          Icon(widget.icon, size: 19, color: AppColors.accent),
           const SizedBox(width: 12),
           Expanded(
             child: TextField(
@@ -64,7 +64,7 @@ class _AuthFieldState extends State<AuthField> {
               style: GoogleFonts.cairo(
                 fontSize: 14.5,
                 fontWeight: FontWeight.w600,
-                color: AppColors.mauve,
+                color: AppColors.textPrimary,
               ),
               decoration: InputDecoration(
                 isCollapsed: true,
@@ -124,8 +124,8 @@ class AuthModeToggle extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(5),
       decoration: BoxDecoration(
-        color: AppColors.blush,
-        borderRadius: BorderRadius.circular(30),
+        color: AppColors.secondary,
+        borderRadius: BorderRadius.circular(28),
       ),
       child: Row(
         children: [
@@ -164,7 +164,7 @@ class _Segment extends StatelessWidget {
           alignment: Alignment.center,
           decoration: BoxDecoration(
             color: active ? AppColors.surface : Colors.transparent,
-            borderRadius: BorderRadius.circular(26),
+            borderRadius: BorderRadius.circular(28),
             boxShadow: active
                 ? const [
                     BoxShadow(
@@ -179,8 +179,8 @@ class _Segment extends StatelessWidget {
             label,
             style: GoogleFonts.cairo(
               fontSize: 13.5,
-              fontWeight: FontWeight.w800,
-              color: active ? AppColors.mauve : AppColors.taupe,
+              fontWeight: FontWeight.w600,
+              color: active ? AppColors.textPrimary : AppColors.textSecondary,
             ),
           ),
         ),
@@ -219,7 +219,7 @@ class AuthBackButton extends StatelessWidget {
           ),
           child: const Icon(
             AppIcons.arrow_back_ios_new_rounded,
-            color: AppColors.mauve,
+            color: AppColors.textPrimary,
             size: 18,
           ),
         ),
@@ -244,13 +244,13 @@ class AuthTermsFooter extends StatelessWidget {
     final base = GoogleFonts.cairo(
       fontSize: 12,
       fontWeight: FontWeight.w600,
-      color: AppColors.taupe,
+      color: AppColors.textSecondary,
       height: 1.6,
     );
     final link = GoogleFonts.cairo(
       fontSize: 12,
-      fontWeight: FontWeight.w800,
-      color: AppColors.roseGold,
+      fontWeight: FontWeight.w600,
+      color: AppColors.accent,
       height: 1.6,
     );
 
@@ -273,7 +273,7 @@ class AuthTermsFooter extends StatelessWidget {
               child: Text('الخصوصية', style: link),
             ),
           ),
-          TextSpan(text: ' الخاصة بـ آيلا.', style: base),
+          TextSpan(text: ' الخاصة بـ لونورا.', style: base),
         ],
       ),
       textAlign: TextAlign.center,
@@ -305,9 +305,9 @@ class AuthSocialSection extends StatelessWidget {
                 'أو تابعي عبر',
                 style: GoogleFonts.cairo(
                   fontSize: 11,
-                  fontWeight: FontWeight.w700,
+                  fontWeight: FontWeight.w600,
                   letterSpacing: 1,
-                  color: AppColors.taupe,
+                  color: AppColors.textSecondary,
                 ),
               ),
             ),
@@ -325,8 +325,8 @@ class AuthSocialSection extends StatelessWidget {
                   'G',
                   style: GoogleFonts.cairo(
                     fontSize: 16,
-                    fontWeight: FontWeight.w800,
-                    color: AppColors.mauve,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textPrimary,
                   ),
                 ),
               ),
@@ -337,9 +337,10 @@ class AuthSocialSection extends StatelessWidget {
                 onTap: onApple,
                 label: 'Apple',
                 leading: const Icon(
+                  // Apple is a brand mark; Lucide's apple icon is the fruit.
                   Icons.apple,
                   size: 21,
-                  color: AppColors.mauve,
+                  color: AppColors.textPrimary,
                 ),
               ),
             ),
@@ -392,8 +393,8 @@ class _SocialButton extends StatelessWidget {
                 label,
                 style: GoogleFonts.cairo(
                   fontSize: 14,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.mauve,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.textPrimary,
                 ),
               ),
             ],

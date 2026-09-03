@@ -131,7 +131,7 @@ void main() {
 
     expect(
       result.orders.single.items.single.imageUrl,
-      'https://aila.ly/storage/products/primer.webp',
+      'https://lunora.ly/storage/products/primer.webp',
     );
   });
 }

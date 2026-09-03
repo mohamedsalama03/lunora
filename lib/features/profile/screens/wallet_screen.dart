@@ -84,7 +84,7 @@ class _WalletScreenState extends State<WalletScreen> {
                             'آخر العمليات',
                             style: GoogleFonts.cairo(
                               fontSize: 18,
-                              fontWeight: FontWeight.w800,
+                              fontWeight: FontWeight.w600,
                               color: AppColors.textPrimary,
                             ),
                           ),
@@ -100,7 +100,7 @@ class _WalletScreenState extends State<WalletScreen> {
                               'عرض الكل',
                               style: GoogleFonts.cairo(
                                 fontSize: 14,
-                                fontWeight: FontWeight.w700,
+                                fontWeight: FontWeight.w600,
                                 color: AppColors.primary,
                               ),
                             ),
@@ -174,13 +174,13 @@ class _WalletScreenState extends State<WalletScreen> {
       ),
       decoration: const BoxDecoration(
         gradient: LinearGradient(
-          colors: [Color(0xFF8E4A54), Color(0xFFB76E79)],
+          colors: [AppColors.primary, AppColors.primary],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.only(
-          bottomLeft: Radius.circular(40),
-          bottomRight: Radius.circular(40),
+          bottomLeft: Radius.circular(28),
+          bottomRight: Radius.circular(28),
         ),
         boxShadow: [
           BoxShadow(
@@ -237,7 +237,7 @@ class _WalletScreenState extends State<WalletScreen> {
                       'محمية',
                       style: GoogleFonts.cairo(
                         fontSize: 13,
-                        fontWeight: FontWeight.w800,
+                        fontWeight: FontWeight.w600,
                         color: Colors.white,
                       ),
                     ),
@@ -251,7 +251,7 @@ class _WalletScreenState extends State<WalletScreen> {
             'محفظتي',
             style: GoogleFonts.cairo(
               fontSize: 32,
-              fontWeight: FontWeight.w900,
+              fontWeight: FontWeight.w600,
               color: Colors.white,
               height: 1.2,
             ),
@@ -280,7 +280,7 @@ class _WalletScreenState extends State<WalletScreen> {
         icon: AppIcons.history_rounded,
         title: 'سجل كامل',
         subtitle: 'تتبع العمليات',
-        gradientColors: const [Color(0xFF673AB7), Color(0xFF9575CD)],
+        gradientColors: const [AppColors.primary, AppColors.primary],
         onTap: () => Navigator.push(
           context,
           MaterialPageRoute(builder: (_) => const WalletTransactionsScreen()),
@@ -296,7 +296,7 @@ class _WalletScreenState extends State<WalletScreen> {
             icon: AppIcons.add_circle_rounded,
             title: 'شحن الرصيد',
             subtitle: 'إضافة أموال',
-            gradientColors: const [Color(0xFFB76E79), Color(0xFFD98A9A)],
+            gradientColors: const [Color(0xFF4A3428), Color(0xFF4A3428)],
             onTap: () {
               if (providers.length == 1) {
                 showModalBottomSheet(
@@ -318,7 +318,7 @@ class _WalletScreenState extends State<WalletScreen> {
             icon: AppIcons.history_rounded,
             title: 'سجل كامل',
             subtitle: 'تتبع العمليات',
-            gradientColors: const [Color(0xFF673AB7), Color(0xFF9575CD)],
+            gradientColors: const [AppColors.primary, AppColors.primary],
             onTap: () => Navigator.push(
               context,
               MaterialPageRoute(
@@ -363,7 +363,7 @@ class _WalletScreenState extends State<WalletScreen> {
               'اختر طريقة الشحن',
               style: GoogleFonts.cairo(
                 fontSize: 17,
-                fontWeight: FontWeight.w800,
+                fontWeight: FontWeight.w600,
                 color: AppColors.textPrimary,
               ),
             ),
@@ -376,7 +376,7 @@ class _WalletScreenState extends State<WalletScreen> {
                   height: 44,
                   decoration: BoxDecoration(
                     gradient: const LinearGradient(
-                      colors: [Color(0xFF8E4A54), Color(0xFFB76E79)],
+                      colors: [AppColors.primary, AppColors.primary],
                     ),
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -391,7 +391,7 @@ class _WalletScreenState extends State<WalletScreen> {
                 title: Text(
                   p.label,
                   style: GoogleFonts.cairo(
-                    fontWeight: FontWeight.w700,
+                    fontWeight: FontWeight.w600,
                     color: AppColors.textPrimary,
                   ),
                 ),
@@ -467,7 +467,7 @@ class _BalanceCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final balance = wallet.summary?.balance.toStringAsFixed(2) ?? '---';
     final currency = wallet.summary?.currency ?? 'LYD';
-    final userName = context.read<AuthProvider>().user?.name ?? 'AILA USER';
+    final userName = context.read<AuthProvider>().user?.name ?? 'LUNORA USER';
 
     return Container(
       width: double.infinity,
@@ -475,11 +475,11 @@ class _BalanceCard extends StatelessWidget {
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
-          colors: [Color(0xFF8E4A54), Color(0xFFB76E79)],
+          colors: [AppColors.primary, AppColors.primary],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.circular(32),
+        borderRadius: BorderRadius.circular(28),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.3),
@@ -538,7 +538,7 @@ class _BalanceCard extends StatelessWidget {
                             style: GoogleFonts.cairo(
                               color: const Color(0xFFFFD700),
                               fontSize: 18,
-                              fontWeight: FontWeight.w700,
+                              fontWeight: FontWeight.w600,
                             ),
                           ),
                           const SizedBox(width: 8),
@@ -547,7 +547,7 @@ class _BalanceCard extends StatelessWidget {
                             style: GoogleFonts.cairo(
                               color: Colors.white,
                               fontSize: 40,
-                              fontWeight: FontWeight.w900,
+                              fontWeight: FontWeight.w600,
                               height: 1.1,
                             ),
                           ),
@@ -698,7 +698,7 @@ class _PremiumActionCard extends StatelessWidget {
               style: GoogleFonts.cairo(
                 color: AppColors.textPrimary,
                 fontSize: 15,
-                fontWeight: FontWeight.w800,
+                fontWeight: FontWeight.w600,
               ),
               textAlign: TextAlign.center,
               maxLines: 1,
@@ -772,7 +772,7 @@ class _TransactionTile extends StatelessWidget {
                 Text(
                   transaction.typeLabel,
                   style: GoogleFonts.cairo(
-                    fontWeight: FontWeight.w800,
+                    fontWeight: FontWeight.w600,
                     fontSize: 14,
                     color: AppColors.textPrimary,
                   ),
@@ -793,7 +793,7 @@ class _TransactionTile extends StatelessWidget {
               Text(
                 '${isDeposit ? '+' : '-'}${transaction.amount.toStringAsFixed(2)} LYD',
                 style: GoogleFonts.cairo(
-                  fontWeight: FontWeight.w800,
+                  fontWeight: FontWeight.w600,
                   fontSize: 15,
                   color: color,
                 ),

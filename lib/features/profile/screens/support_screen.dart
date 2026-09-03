@@ -15,7 +15,7 @@ class SupportScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFFF8F7),
+      backgroundColor: AppColors.background,
       body: SafeArea(
         child: Column(
           children: [
@@ -23,7 +23,7 @@ class SupportScreen extends StatelessWidget {
             Expanded(
               child: ListView(
                 physics: const BouncingScrollPhysics(),
-                padding: const EdgeInsets.fromLTRB(20, 10, 20, 28),
+                padding: const EdgeInsets.fromLTRB(24, 10, 24, 28),
                 children: const [
                   _SupportIntroCard(),
                   SizedBox(height: 18),
@@ -60,7 +60,7 @@ class _SupportTopBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 6),
+      padding: const EdgeInsets.fromLTRB(24, 8, 24, 6),
       child: Row(
         children: [
           _CircleActionButton(
@@ -72,7 +72,7 @@ class _SupportTopBar extends StatelessWidget {
             'الدعم',
             style: GoogleFonts.cairo(
               fontSize: 18,
-              fontWeight: FontWeight.w800,
+              fontWeight: FontWeight.w600,
               color: AppColors.textPrimary,
             ),
           ),
@@ -91,14 +91,14 @@ class _SupportIntroCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(22),
+      padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         color: AppColors.surface,
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: const Color(0xFFEFE3E6)),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.divider),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.035),
+            color: AppColors.textPrimary.withValues(alpha: 0.035),
             blurRadius: 18,
             offset: const Offset(0, 8),
           ),
@@ -112,7 +112,7 @@ class _SupportIntroCard extends StatelessWidget {
             height: 54,
             decoration: BoxDecoration(
               color: AppColors.primaryUltraLight.withValues(alpha: 0.55),
-              borderRadius: BorderRadius.circular(18),
+              borderRadius: BorderRadius.circular(16),
             ),
             child: const Icon(
               AppIcons.headset_mic_rounded,
@@ -125,7 +125,7 @@ class _SupportIntroCard extends StatelessWidget {
             'مركز مساعدة ${AppConstants.appName}',
             style: GoogleFonts.cairo(
               fontSize: 22,
-              fontWeight: FontWeight.w900,
+              fontWeight: FontWeight.w600,
               color: AppColors.textPrimary,
               height: 1.25,
             ),
@@ -151,18 +151,17 @@ class _SupportContactCard extends StatelessWidget {
 
   static const String contactPhone = '0912884731';
   static const String whatsappPhone = '0914363102';
-  static const String supportEmail = 'support@aila.ly';
 
   @override
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFFEFE3E6)),
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.divider),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.025),
+            color: AppColors.textPrimary.withValues(alpha: 0.025),
             blurRadius: 14,
             offset: const Offset(0, 6),
           ),
@@ -180,12 +179,6 @@ class _SupportContactCard extends StatelessWidget {
             icon: AppIcons.phone_iphone_rounded,
             title: 'رقم الواتساب',
             value: whatsappPhone,
-          ),
-          _ContactDivider(),
-          _ContactRow(
-            icon: AppIcons.email_outlined,
-            title: 'البريد الإلكتروني',
-            value: supportEmail,
           ),
         ],
       ),
@@ -215,7 +208,7 @@ class _ContactRow extends StatelessWidget {
             height: 42,
             decoration: BoxDecoration(
               color: AppColors.primaryUltraLight.withValues(alpha: 0.45),
-              borderRadius: BorderRadius.circular(14),
+              borderRadius: BorderRadius.circular(16),
             ),
             child: Icon(icon, color: AppColors.primary, size: 22),
           ),
@@ -228,7 +221,7 @@ class _ContactRow extends StatelessWidget {
                   title,
                   style: GoogleFonts.cairo(
                     fontSize: 12,
-                    fontWeight: FontWeight.w700,
+                    fontWeight: FontWeight.w600,
                     color: AppColors.textHint,
                   ),
                 ),
@@ -241,7 +234,7 @@ class _ContactRow extends StatelessWidget {
                   textAlign: TextAlign.right,
                   style: GoogleFonts.cairo(
                     fontSize: 15,
-                    fontWeight: FontWeight.w800,
+                    fontWeight: FontWeight.w600,
                     color: AppColors.textPrimary,
                   ),
                 ),
@@ -271,7 +264,7 @@ class _ContactDivider extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Divider(height: 1, color: Color(0xFFEFE3E6));
+    return const Divider(height: 1, color: AppColors.divider);
   }
 }
 
@@ -343,9 +336,9 @@ class _SupportTopicCard extends StatelessWidget {
       height: 144,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFFEFE3E6)),
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.divider),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -358,7 +351,7 @@ class _SupportTopicCard extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
             style: GoogleFonts.cairo(
               fontSize: 15,
-              fontWeight: FontWeight.w800,
+              fontWeight: FontWeight.w600,
               color: AppColors.textPrimary,
             ),
           ),
@@ -388,9 +381,9 @@ class _SupportChecklistCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFFEFE3E6)),
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.divider),
       ),
       child: const Column(
         children: [
@@ -455,9 +448,9 @@ class _FaqCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFFEFE3E6)),
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.divider),
       ),
       child: const Column(
         children: [
@@ -503,7 +496,7 @@ class _FaqTile extends StatelessWidget {
           question,
           style: GoogleFonts.cairo(
             fontSize: 14,
-            fontWeight: FontWeight.w800,
+            fontWeight: FontWeight.w600,
             color: AppColors.textPrimary,
           ),
         ),
@@ -531,7 +524,7 @@ class _FaqDivider extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Divider(height: 1, color: Color(0xFFEFE3E6));
+    return const Divider(height: 1, color: AppColors.divider);
   }
 }
 
@@ -544,7 +537,7 @@ class _CopySupportMessageCard extends StatelessWidget {
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
         color: AppColors.primary,
-        borderRadius: BorderRadius.circular(22),
+        borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
             color: AppColors.primary.withValues(alpha: 0.18),
@@ -560,8 +553,8 @@ class _CopySupportMessageCard extends StatelessWidget {
             'نموذج رسالة جاهز',
             style: GoogleFonts.cairo(
               fontSize: 17,
-              fontWeight: FontWeight.w900,
-              color: Colors.white,
+              fontWeight: FontWeight.w600,
+              color: AppColors.surface,
             ),
           ),
           const SizedBox(height: 6),
@@ -570,7 +563,7 @@ class _CopySupportMessageCard extends StatelessWidget {
             style: GoogleFonts.cairo(
               fontSize: 13,
               fontWeight: FontWeight.w600,
-              color: Colors.white.withValues(alpha: 0.86),
+              color: AppColors.surface.withValues(alpha: 0.86),
               height: 1.5,
             ),
           ),
@@ -582,10 +575,10 @@ class _CopySupportMessageCard extends StatelessWidget {
               icon: const Icon(AppIcons.copy_rounded, size: 19),
               label: Text(
                 'نسخ نموذج الرسالة',
-                style: GoogleFonts.cairo(fontWeight: FontWeight.w800),
+                style: GoogleFonts.cairo(fontWeight: FontWeight.w600),
               ),
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.white,
+                backgroundColor: AppColors.surface,
                 foregroundColor: AppColors.primary,
                 elevation: 0,
                 padding: const EdgeInsets.symmetric(vertical: 14),
@@ -642,7 +635,7 @@ class _SectionTitle extends StatelessWidget {
       title,
       style: GoogleFonts.cairo(
         fontSize: 16,
-        fontWeight: FontWeight.w900,
+        fontWeight: FontWeight.w600,
         color: AppColors.textPrimary,
       ),
     );
@@ -664,12 +657,12 @@ class _CircleActionButton extends StatelessWidget {
         width: 42,
         height: 42,
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.surface,
           shape: BoxShape.circle,
-          border: Border.all(color: const Color(0xFFEFE3E6)),
+          border: Border.all(color: AppColors.divider),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.035),
+              color: AppColors.textPrimary.withValues(alpha: 0.035),
               blurRadius: 14,
               offset: const Offset(0, 5),
             ),

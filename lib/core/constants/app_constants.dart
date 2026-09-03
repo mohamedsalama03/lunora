@@ -1,7 +1,7 @@
 class AppConstants {
   AppConstants._();
 
-  static const String appName = 'AILA';
+  static const String appName = 'LUNORA';
   static const String appVersion = '1.0.0';
 
   static const String logoPath = 'assets/images/logo.png';

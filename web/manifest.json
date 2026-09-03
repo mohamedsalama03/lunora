@@ -1,11 +1,11 @@
 {
-    "name": "AILA Beauty Boutique",
-    "short_name": "AILA",
+    "name": "LUNORA Beauty Boutique",
+    "short_name": "LUNORA",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#FFF8F7",
-    "theme_color": "#B76E79",
-    "description": "AILA Beauty Boutique — soft luxury beauty.",
+    "background_color": "#F8F5F0",
+    "theme_color": "#4A3428",
+    "description": "LUNORA Beauty Boutique — soft luxury beauty.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

@@ -207,7 +207,7 @@ class BrandModel {
   factory BrandModel.fromJson(Map<String, dynamic> json) {
     return BrandModel(
       id: _asInt(json['id']),
-      name: _asString(json['name']),
+      name: _displayBrandName(json['name']),
       slug: _asString(json['slug']),
       logoUrl: _asNullableString(json['logo_url']),
     );
@@ -317,6 +317,12 @@ List<String> _asStringList(dynamic value) {
 
 String _asString(dynamic value, {String fallback = ''}) {
   return value?.toString() ?? fallback;
+}
+
+String _displayBrandName(dynamic value) {
+  return _asString(value)
+      .replaceAll(RegExp(r'\bAILA\b', caseSensitive: false), 'LUNORA')
+      .replaceAll('آيلا', 'لونورا');
 }
 
 String? _asNullableString(dynamic value) {

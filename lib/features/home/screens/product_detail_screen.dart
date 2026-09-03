@@ -3,38 +3,61 @@ import 'package:app_aila/core/theme/app_icons.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import '../../../core/theme/app_colors.dart';
 import '../../../core/navigation/app_shell_controller.dart';
 import '../../../shared/widgets/aila_ui.dart';
+import '../../../shared/widgets/custom_navbar.dart';
+import '../../auth/providers/auth_provider.dart';
+import '../../auth/screens/login_screen.dart';
+import '../../auth/widgets/auth_required_dialog.dart';
 import '../../cart/providers/cart_provider.dart';
 import '../../wishlist/providers/wishlist_provider.dart';
 import '../../../core/utils/app_notifications.dart';
 import '../../../core/models/product_model.dart';
 import '../providers/home_provider.dart';
 
-/// Returns the elegant AILA product title style: Playfair Display serif for
-/// Latin names (matching the Lovable `text-display` token), Cairo for Arabic
-/// names since Playfair has no Arabic glyphs.
+class _AuraColors {
+  _AuraColors._();
+
+  static const primary = Color(0xFF4A3428);
+  static const roseGold = primary;
+  static const blush = Color(0xFFEADCC8);
+  static const background = Color(0xFFF8F5F0);
+  static const surface = Color(0xFFFCFAF6);
+  static const surfaceVariant = Color(0xFFF2ECE3);
+  static const divider = Color(0xFFE4DBCE);
+  static const mauve = Color(0xFF2E211B);
+  static const taupe = Color(0xFF6D5A4D);
+  static const textHint = Color(0xFF9B8A7D);
+  static const badge = Color(0xFF9A493F);
+  static const accent = Color(0xFFB88746);
+  static const shadowCard = Color(0x142E211B);
+  static const shadowSoft = Color(0x242E211B);
+  static const roseGradient = LinearGradient(
+    colors: [Color(0xFF4A3428), Color(0xFF4A3428)],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+}
+
+/// Returns the LUNORA product title style in Cairo for Arabic and Latin names.
 bool _containsArabic(String value) => RegExp(r'[؀-ۿ]').hasMatch(value);
 
 TextStyle _ailaProductTitle(
   String text, {
   double size = 28,
-  Color color = AppColors.mauve,
+  Color color = _AuraColors.mauve,
 }) {
   if (_containsArabic(text)) {
     return GoogleFonts.cairo(
       fontSize: size,
-      fontWeight: FontWeight.w800,
+      fontWeight: FontWeight.w600,
       color: color,
       height: 1.18,
     );
   }
-  // Latin names use Playfair Display (letter-spacing -0.015em) to mirror the
-  // Lovable design's serif display type.
-  return GoogleFonts.playfairDisplay(
+  return GoogleFonts.cairo(
     fontSize: size,
-    fontWeight: FontWeight.w600,
+    fontWeight: FontWeight.w500,
     color: color,
     height: 1.06,
     letterSpacing: size * -0.015,
@@ -168,7 +191,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         return const Color(0xFFFFD700);
       case 'navy':
       case 'كحلي':
-        return const Color(0xFF8E4A54);
+        return const Color(0xFF1F2A44);
     }
 
     if (!_isHexColor(normalized)) {
@@ -543,15 +566,38 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     Navigator.of(context).popUntil((route) => route.isFirst);
   }
 
+  Future<void> _handleNavigationTap(int index) async {
+    final auth = context.read<AuthProvider>();
+    if (index == AppShellController.profileIndex && !auth.isAuthenticated) {
+      final action = await showAuthRequiredDialog(
+        context,
+        badge: 'هذه الصفحة تحتاج حسابًا',
+        title: 'سجّلي دخولك للوصول إلى حسابك',
+        message: 'طلباتك وعناوينك ومحفظتك محفوظة بأمان داخل حسابك.',
+        primaryLabel: 'تسجيل الدخول',
+        secondaryLabel: 'لاحقًا',
+        icon: AppIcons.person_outline_rounded,
+      );
+      if (!mounted || action != AuthPromptAction.login) return;
+      final authenticated = await Navigator.of(context).push<bool>(
+        MaterialPageRoute<bool>(
+          builder: (_) => const LoginScreen(returnAfterAuth: true),
+        ),
+      );
+      if (!mounted || authenticated != true) return;
+    }
+    if (!mounted) return;
+    context.read<AppShellController>().setIndex(index);
+    Navigator.of(context).popUntil((route) => route.isFirst);
+  }
+
   @override
   Widget build(BuildContext context) {
     final product = _currentProduct;
-    // Image stage takes ~58% of the viewport height (Lovable `h-[58vh]`),
-    // gently clamped so it stays graceful on very small / very tall devices.
-    final headerHeight = (MediaQuery.sizeOf(context).height * 0.58).clamp(
-      380.0,
-      560.0,
-    );
+    final shellIndex = context.watch<AppShellController>().currentIndex;
+    final bottomInset = MediaQuery.viewPaddingOf(context).bottom;
+    final actionBottom = 104.0 + (bottomInset > 14 ? bottomInset - 14 : 0);
+    final headerHeight = MediaQuery.sizeOf(context).width * 1.25;
     final devicePixelRatio = MediaQuery.devicePixelRatioOf(context);
     final galleryCacheWidth =
         (MediaQuery.sizeOf(context).width * devicePixelRatio).round().clamp(
@@ -564,6 +610,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     final selectedColorVariant = _findColorVariant(product, selectedColorValue);
     final effectivePrice =
         selectedColorVariant?.finalPrice ?? product.pricing.effectivePrice;
+    final originalPrice =
+        product.pricing.price + (selectedColorVariant?.priceModifier ?? 0);
     final isPurchasable = selectedColorVariant != null
         ? product.stock.isAvailable && selectedColorVariant.isAvailable
         : product.isPurchasable;
@@ -578,7 +626,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
-        backgroundColor: AppColors.background,
+        backgroundColor: _AuraColors.background,
+        extendBody: true,
         body: Stack(
           children: [
             CustomScrollView(
@@ -612,12 +661,12 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 SliverToBoxAdapter(
                   child: _buildContent(
                     product: product,
-                    headerHeight: headerHeight,
                     eyebrowLabel: eyebrowLabel,
                     subtitleText: subtitleText,
                     colorValues: colorValues,
                     selectedColorValue: selectedColorValue,
                     effectivePrice: effectivePrice,
+                    originalPrice: originalPrice,
                     canDecreaseQuantity: canDecreaseQuantity,
                     canIncreaseQuantity: canIncreaseQuantity,
                   ),
@@ -629,10 +678,21 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             Positioned(
               left: 0,
               right: 0,
-              bottom: 0,
-              child: _BottomBar(
+              bottom: actionBottom,
+              child: _AuraBottomBar(
                 total: lineTotal,
+                quantity: _quantity,
                 isPurchasable: isPurchasable,
+                canDecrease: canDecreaseQuantity,
+                canIncrease: canIncreaseQuantity,
+                onDecrease: () {
+                  if (!canDecreaseQuantity) return;
+                  setState(() => _quantity--);
+                },
+                onIncrease: () {
+                  if (!canIncreaseQuantity) return;
+                  setState(() => _quantity++);
+                },
                 onAddToBag: () => _addToBag(
                   product: product,
                   effectivePrice: effectivePrice,
@@ -645,38 +705,30 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             ),
           ],
         ),
+        bottomNavigationBar: CustomNavBar(
+          currentIndex: shellIndex,
+          onTap: _handleNavigationTap,
+        ),
       ),
     );
   }
 
   Widget _buildContent({
     required ProductModel product,
-    required double headerHeight,
     required String? eyebrowLabel,
     required String? subtitleText,
     required List<String> colorValues,
     required String? selectedColorValue,
     required double effectivePrice,
+    required double originalPrice,
     required bool canDecreaseQuantity,
     required bool canIncreaseQuantity,
   }) {
     return Container(
       width: double.infinity,
-      constraints: BoxConstraints(
-        minHeight: MediaQuery.of(context).size.height - headerHeight + 32,
-      ),
-      decoration: const BoxDecoration(
-        color: AppColors.background,
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(40),
-          topRight: Radius.circular(40),
-        ),
-      ),
-      transform: Matrix4.translationValues(0, -32, 0),
+      color: _AuraColors.background,
       child: Padding(
-        // Top padding must clear the 32px overlap so the title sits comfortably
-        // below the image (visible gap = 48 - 32 = 16px), not on top of it.
-        padding: const EdgeInsets.fromLTRB(24, 48, 24, 150),
+        padding: const EdgeInsets.fromLTRB(24, 24, 24, 260),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -685,8 +737,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 padding: const EdgeInsets.only(bottom: 18),
                 child: LinearProgressIndicator(
                   minHeight: 2,
-                  color: AppColors.primary,
-                  backgroundColor: AppColors.primary.withValues(alpha: 0.08),
+                  color: _AuraColors.primary,
+                  backgroundColor: _AuraColors.primary.withValues(alpha: 0.08),
                 ),
               ),
 
@@ -701,6 +753,33 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               const SizedBox(height: 16),
               _RatingRow(rating: product.rating),
             ],
+            const SizedBox(height: 14),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Text(
+                  _formatAuraMoney(effectivePrice),
+                  style: GoogleFonts.cairo(
+                    fontSize: 24,
+                    fontWeight: FontWeight.w600,
+                    color: _AuraColors.mauve,
+                    height: 1,
+                  ),
+                ),
+                if (product.pricing.isOnSale) ...[
+                  const SizedBox(width: 8),
+                  Text(
+                    _formatAuraMoney(originalPrice),
+                    style: GoogleFonts.cairo(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w400,
+                      color: _AuraColors.taupe,
+                      decoration: TextDecoration.lineThrough,
+                    ),
+                  ),
+                ],
+              ],
+            ),
             const SizedBox(height: 24),
 
             // Tabs
@@ -732,32 +811,33 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             ],
 
             // Quantity
-            Row(
-              children: [
-                Text(
-                  'الكمية',
-                  style: GoogleFonts.cairo(
-                    fontSize: 15.5,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.mauve,
+            if (_quantity < 0)
+              Row(
+                children: [
+                  Text(
+                    'الكمية',
+                    style: GoogleFonts.cairo(
+                      fontSize: 15.5,
+                      fontWeight: FontWeight.w600,
+                      color: _AuraColors.mauve,
+                    ),
                   ),
-                ),
-                const Spacer(),
-                _QuantityStepper(
-                  quantity: _quantity,
-                  canDecrease: canDecreaseQuantity,
-                  canIncrease: canIncreaseQuantity,
-                  onDecrease: () {
-                    if (!canDecreaseQuantity) return;
-                    setState(() => _quantity--);
-                  },
-                  onIncrease: () {
-                    if (!canIncreaseQuantity) return;
-                    setState(() => _quantity++);
-                  },
-                ),
-              ],
-            ),
+                  const Spacer(),
+                  _QuantityStepper(
+                    quantity: _quantity,
+                    canDecrease: canDecreaseQuantity,
+                    canIncrease: canIncreaseQuantity,
+                    onDecrease: () {
+                      if (!canDecreaseQuantity) return;
+                      setState(() => _quantity--);
+                    },
+                    onIncrease: () {
+                      if (!canIncreaseQuantity) return;
+                      setState(() => _quantity++);
+                    },
+                  ),
+                ],
+              ),
 
             // You may also love
             if (_relatedProducts.isNotEmpty) ...[
@@ -766,13 +846,13 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 'قد يعجبكِ أيضاً',
                 style: GoogleFonts.cairo(
                   fontSize: 19,
-                  fontWeight: FontWeight.w800,
-                  color: AppColors.mauve,
+                  fontWeight: FontWeight.w600,
+                  color: _AuraColors.mauve,
                 ),
               ),
               const SizedBox(height: 12),
               SizedBox(
-                height: 280,
+                height: 320,
                 child: ListView.separated(
                   scrollDirection: Axis.horizontal,
                   physics: const BouncingScrollPhysics(),
@@ -818,15 +898,15 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     vertical: 8,
                   ),
                   decoration: BoxDecoration(
-                    color: AppColors.blush,
+                    color: _AuraColors.blush,
                     borderRadius: BorderRadius.circular(30),
                   ),
                   child: Text(
                     tag,
                     style: GoogleFonts.cairo(
                       fontSize: 13,
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.mauve,
+                      fontWeight: FontWeight.w600,
+                      color: _AuraColors.mauve,
                     ),
                   ),
                 ),
@@ -868,7 +948,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   TextStyle get _tabBodyTextStyle => GoogleFonts.cairo(
     fontSize: 14,
     fontWeight: FontWeight.w500,
-    color: AppColors.taupe,
+    color: _AuraColors.taupe,
     height: 1.7,
   );
 
@@ -890,8 +970,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               'اللون',
               style: GoogleFonts.cairo(
                 fontSize: 15.5,
-                fontWeight: FontWeight.w700,
-                color: AppColors.mauve,
+                fontWeight: FontWeight.w600,
+                color: _AuraColors.mauve,
               ),
             ),
             if (selectedColorValue != null &&
@@ -902,7 +982,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 style: GoogleFonts.cairo(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
-                  color: AppColors.taupe,
+                  color: _AuraColors.taupe,
                 ),
               ),
             ],
@@ -922,38 +1002,30 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             return GestureDetector(
               onTap: () => _selectColor(product, colorValue),
               child: AnimatedContainer(
-                duration: const Duration(milliseconds: 280),
-                curve: Curves.easeOutBack,
-                width: isSelected ? 48 : 42,
-                height: isSelected ? 48 : 42,
+                duration: const Duration(milliseconds: 180),
+                width: 44,
+                height: 44,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: Colors.white,
+                  color: _AuraColors.surface,
                   border: Border.all(
-                    color: isSelected ? AppColors.primary : Colors.transparent,
+                    color: isSelected
+                        ? _AuraColors.primary
+                        : Colors.transparent,
                     width: isSelected ? 2 : 0,
                   ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: isSelected
-                          ? AppColors.primary.withValues(alpha: 0.25)
-                          : AppColors.shadowCard,
-                      blurRadius: isSelected ? 12 : 6,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
                 ),
-                padding: EdgeInsets.all(isSelected ? 3 : 4),
+                padding: const EdgeInsets.all(5),
                 child: Container(
                   decoration: BoxDecoration(
                     color: hasValidColor
                         ? swatchColor
-                        : AppColors.surfaceVariant,
+                        : _AuraColors.surfaceVariant,
                     shape: BoxShape.circle,
                     border: Border.all(
                       color: isSelected
                           ? Colors.transparent
-                          : AppColors.divider,
+                          : _AuraColors.divider,
                       width: 1,
                     ),
                   ),
@@ -962,7 +1034,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                       ? const Icon(
                           AppIcons.palette_outlined,
                           size: 16,
-                          color: AppColors.textHint,
+                          color: _AuraColors.textHint,
                         )
                       : (isSelected
                             ? Icon(
@@ -990,8 +1062,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           'المقاسات',
           style: GoogleFonts.cairo(
             fontSize: 15.5,
-            fontWeight: FontWeight.w700,
-            color: AppColors.mauve,
+            fontWeight: FontWeight.w600,
+            color: _AuraColors.mauve,
           ),
         ),
         const SizedBox(height: 14),
@@ -1000,18 +1072,20 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           runSpacing: 10,
           children: product.options!.sizes.map((sizeName) {
             return Container(
-              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+              width: 64,
+              height: 44,
+              alignment: Alignment.center,
               decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(30),
-                border: Border.all(color: AppColors.divider),
+                color: _AuraColors.surface,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: _AuraColors.divider),
               ),
               child: Text(
                 sizeName,
                 style: GoogleFonts.cairo(
                   fontSize: 14,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.mauve,
+                  fontWeight: FontWeight.w600,
+                  color: _AuraColors.mauve,
                 ),
               ),
             );
@@ -1061,13 +1135,9 @@ class _ImageHeader extends StatelessWidget {
           // Image gallery on a soft blush stage with a softly rounded base
           Positioned.fill(
             child: ClipRRect(
-              borderRadius: const BorderRadius.vertical(
-                bottom: Radius.circular(40),
-              ),
+              borderRadius: BorderRadius.zero,
               child: DecoratedBox(
-                decoration: const BoxDecoration(
-                  gradient: AppColors.blushGradient,
-                ),
+                decoration: const BoxDecoration(color: _AuraColors.blush),
                 child: PageView.builder(
                   controller: pageController,
                   physics: const BouncingScrollPhysics(),
@@ -1088,7 +1158,7 @@ class _ImageHeader extends StatelessWidget {
                                   child: Icon(
                                     AppIcons.image_outlined,
                                     size: 120,
-                                    color: AppColors.primary.withValues(
+                                    color: _AuraColors.primary.withValues(
                                       alpha: 0.3,
                                     ),
                                   ),
@@ -1098,7 +1168,7 @@ class _ImageHeader extends StatelessWidget {
                             child: Icon(
                               AppIcons.image_outlined,
                               size: 120,
-                              color: AppColors.primary.withValues(alpha: 0.3),
+                              color: _AuraColors.primary.withValues(alpha: 0.3),
                             ),
                           );
 
@@ -1119,7 +1189,7 @@ class _ImageHeader extends StatelessWidget {
           SafeArea(
             bottom: false,
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(20, 8, 20, 0),
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
               child: Row(
                 children: [
                   _GlassCircleButton(
@@ -1146,7 +1216,9 @@ class _ImageHeader extends StatelessWidget {
                             ? AppIcons.favorite_rounded
                             : AppIcons.favorite_border_rounded,
                         iconSize: 16,
-                        iconColor: isFav ? AppColors.badge : AppColors.roseGold,
+                        iconColor: isFav
+                            ? _AuraColors.badge
+                            : _AuraColors.roseGold,
                         onTap: () {
                           wishlist.toggleFavorite(product);
                           AppNotifications.showSuccess(
@@ -1167,7 +1239,7 @@ class _ImageHeader extends StatelessWidget {
           // Dot indicators
           if (galleryImageUrls.length > 1)
             Positioned(
-              bottom: 46,
+              bottom: 16,
               left: 0,
               right: 0,
               child: Center(
@@ -1175,14 +1247,7 @@ class _ImageHeader extends StatelessWidget {
                   valueListenable: selectedImageNotifier,
                   builder: (context, selectedImageUrl, _) {
                     return Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 8,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.6),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
+                      padding: EdgeInsets.zero,
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: List.generate(galleryImageUrls.length, (
@@ -1194,14 +1259,16 @@ class _ImageHeader extends StatelessWidget {
                             onTap: () => onDotTap(index),
                             child: AnimatedContainer(
                               duration: const Duration(milliseconds: 200),
-                              margin: const EdgeInsets.symmetric(horizontal: 4),
-                              width: isActive ? 18 : 8,
-                              height: 8,
+                              margin: const EdgeInsets.symmetric(horizontal: 3),
+                              width: isActive ? 24 : 6,
+                              height: 4,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(8),
                                 color: isActive
-                                    ? AppColors.roseGold
-                                    : AppColors.textHint.withValues(alpha: 0.5),
+                                    ? _AuraColors.primary
+                                    : _AuraColors.primary.withValues(
+                                        alpha: 0.3,
+                                      ),
                               ),
                             ),
                           );
@@ -1229,7 +1296,7 @@ class _GlassCircleButton extends StatelessWidget {
     required this.icon,
     required this.onTap,
     this.iconSize = 18,
-    this.iconColor = AppColors.mauve,
+    this.iconColor = _AuraColors.mauve,
     this.badgeCount = 0,
   });
 
@@ -1239,7 +1306,7 @@ class _GlassCircleButton extends StatelessWidget {
       clipBehavior: Clip.none,
       children: [
         Material(
-          color: Colors.white.withValues(alpha: 0.9),
+          color: _AuraColors.background.withValues(alpha: 0.9),
           shape: const CircleBorder(),
           elevation: 0,
           child: InkWell(
@@ -1249,17 +1316,7 @@ class _GlassCircleButton extends StatelessWidget {
               width: 40,
               height: 40,
               alignment: Alignment.center,
-              decoration: const BoxDecoration(
-                shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(
-                    color: AppColors.shadowSoft,
-                    blurRadius: 30,
-                    spreadRadius: -10,
-                    offset: Offset(0, 8),
-                  ),
-                ],
-              ),
+              decoration: const BoxDecoration(shape: BoxShape.circle),
               child: Icon(icon, size: iconSize, color: iconColor),
             ),
           ),
@@ -1272,7 +1329,7 @@ class _GlassCircleButton extends StatelessWidget {
               constraints: const BoxConstraints(minWidth: 18, minHeight: 18),
               padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
               decoration: BoxDecoration(
-                color: AppColors.badge,
+                color: _AuraColors.badge,
                 borderRadius: BorderRadius.circular(999),
                 border: Border.all(color: Colors.white, width: 1.5),
               ),
@@ -1281,7 +1338,7 @@ class _GlassCircleButton extends StatelessWidget {
                 badgeCount > 99 ? '99+' : '$badgeCount',
                 style: GoogleFonts.cairo(
                   fontSize: 9,
-                  fontWeight: FontWeight.w700,
+                  fontWeight: FontWeight.w600,
                   color: Colors.white,
                   height: 1,
                 ),
@@ -1309,7 +1366,7 @@ class _ProductHeading extends StatelessWidget {
     final length = productName.characters.length;
     // Mirrors Lovable's `text-3xl` (~30px) display title, eased down for
     // longer names and narrow screens.
-    final baseSize = width < 360 ? 26.0 : 29.0;
+    final baseSize = width < 360 ? 22.0 : 24.0;
 
     if (length >= 22) {
       return baseSize - 3;
@@ -1342,9 +1399,9 @@ class _ProductHeading extends StatelessWidget {
               textAlign: TextAlign.start,
               style: GoogleFonts.cairo(
                 fontSize: 10,
-                fontWeight: FontWeight.w700,
+                fontWeight: FontWeight.w600,
                 letterSpacing: _containsArabic(eyebrow) ? 0 : 3.0,
-                color: AppColors.roseGold,
+                color: _AuraColors.accent,
                 height: 1.2,
               ),
             ),
@@ -1370,7 +1427,7 @@ class _ProductHeading extends StatelessWidget {
               style: GoogleFonts.cairo(
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
-                color: AppColors.taupe,
+                color: _AuraColors.taupe,
                 height: 1.45,
               ),
             ),
@@ -1404,7 +1461,7 @@ class _RatingRow extends StatelessWidget {
               child: Icon(
                 isFilled ? AppIcons.star_rounded : AppIcons.star_border_rounded,
                 size: 14,
-                color: AppColors.roseGold,
+                color: _AuraColors.accent,
               ),
             );
           }),
@@ -1415,7 +1472,7 @@ class _RatingRow extends StatelessWidget {
           style: GoogleFonts.cairo(
             fontSize: 12.5,
             fontWeight: FontWeight.w600,
-            color: AppColors.taupe,
+            color: _AuraColors.taupe,
           ),
         ),
       ],
@@ -1441,8 +1498,9 @@ class _TabPills extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
-        color: AppColors.blush,
-        borderRadius: BorderRadius.circular(30),
+        color: _AuraColors.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: _AuraColors.divider),
       ),
       child: Row(
         children: List.generate(labels.length, (index) {
@@ -1453,20 +1511,10 @@ class _TabPills extends StatelessWidget {
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 200),
                 margin: const EdgeInsets.symmetric(horizontal: 3),
-                padding: const EdgeInsets.symmetric(vertical: 10),
+                padding: const EdgeInsets.symmetric(vertical: 9),
                 decoration: BoxDecoration(
-                  color: isActive ? Colors.white : Colors.transparent,
-                  borderRadius: BorderRadius.circular(26),
-                  boxShadow: isActive
-                      ? const [
-                          BoxShadow(
-                            color: AppColors.shadowSoft,
-                            blurRadius: 20,
-                            spreadRadius: -6,
-                            offset: Offset(0, 6),
-                          ),
-                        ]
-                      : null,
+                  color: isActive ? _AuraColors.primary : Colors.transparent,
+                  borderRadius: BorderRadius.circular(12),
                 ),
                 alignment: Alignment.center,
                 child: Text(
@@ -1475,8 +1523,8 @@ class _TabPills extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: GoogleFonts.cairo(
                     fontSize: 12,
-                    fontWeight: isActive ? FontWeight.w700 : FontWeight.w500,
-                    color: isActive ? AppColors.mauve : AppColors.taupe,
+                    fontWeight: isActive ? FontWeight.w600 : FontWeight.w400,
+                    color: isActive ? _AuraColors.surface : _AuraColors.taupe,
                   ),
                 ),
               ),
@@ -1500,7 +1548,7 @@ class _TabPlaceholder extends StatelessWidget {
         const Icon(
           AppIcons.info_outline_rounded,
           size: 18,
-          color: AppColors.textHint,
+          color: _AuraColors.textHint,
         ),
         const SizedBox(width: 8),
         Expanded(
@@ -1509,7 +1557,7 @@ class _TabPlaceholder extends StatelessWidget {
             style: GoogleFonts.cairo(
               fontSize: 14,
               fontWeight: FontWeight.w500,
-              color: AppColors.textHint,
+              color: _AuraColors.textHint,
               height: 1.5,
             ),
           ),
@@ -1538,8 +1586,8 @@ class _DetailRow extends StatelessWidget {
               label,
               style: GoogleFonts.cairo(
                 fontSize: 13.5,
-                fontWeight: FontWeight.w700,
-                color: AppColors.taupe,
+                fontWeight: FontWeight.w600,
+                color: _AuraColors.taupe,
               ),
             ),
           ),
@@ -1549,7 +1597,7 @@ class _DetailRow extends StatelessWidget {
               style: GoogleFonts.cairo(
                 fontSize: 13.5,
                 fontWeight: FontWeight.w600,
-                color: AppColors.mauve,
+                color: _AuraColors.mauve,
                 height: 1.4,
               ),
             ),
@@ -1585,10 +1633,10 @@ class _QuantityStepper extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(40),
-        border: Border.all(color: AppColors.divider),
+        border: Border.all(color: _AuraColors.divider),
         boxShadow: const [
           BoxShadow(
-            color: AppColors.shadowCard,
+            color: _AuraColors.shadowCard,
             blurRadius: 24,
             spreadRadius: -8,
             offset: Offset(0, 4),
@@ -1608,8 +1656,8 @@ class _QuantityStepper extends StatelessWidget {
                 AppIcons.remove_rounded,
                 size: 15,
                 color: canDecrease
-                    ? AppColors.roseGold
-                    : AppColors.textHint.withValues(alpha: 0.45),
+                    ? _AuraColors.roseGold
+                    : _AuraColors.textHint.withValues(alpha: 0.45),
               ),
             ),
           ),
@@ -1628,8 +1676,8 @@ class _QuantityStepper extends StatelessWidget {
                 textAlign: TextAlign.center,
                 style: GoogleFonts.cairo(
                   fontSize: 14,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.mauve,
+                  fontWeight: FontWeight.w600,
+                  color: _AuraColors.mauve,
                 ),
               ),
             ),
@@ -1643,7 +1691,7 @@ class _QuantityStepper extends StatelessWidget {
                 width: 32,
                 height: 32,
                 decoration: const BoxDecoration(
-                  gradient: AppColors.roseGradient,
+                  gradient: _AuraColors.roseGradient,
                   shape: BoxShape.circle,
                 ),
                 alignment: Alignment.center,
@@ -1663,6 +1711,164 @@ class _QuantityStepper extends StatelessWidget {
 
 // ─── Bottom bar ──────────────────────────────────────────────────────────────
 
+class _AuraBottomBar extends StatelessWidget {
+  final double total;
+  final int quantity;
+  final bool isPurchasable;
+  final bool canDecrease;
+  final bool canIncrease;
+  final VoidCallback onDecrease;
+  final VoidCallback onIncrease;
+  final VoidCallback onAddToBag;
+
+  const _AuraBottomBar({
+    required this.total,
+    required this.quantity,
+    required this.isPurchasable,
+    required this.canDecrease,
+    required this.canIncrease,
+    required this.onDecrease,
+    required this.onIncrease,
+    required this.onAddToBag,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
+      child: Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: _AuraColors.surface,
+          borderRadius: BorderRadius.circular(999),
+          border: Border.all(color: _AuraColors.divider),
+          boxShadow: const [
+            BoxShadow(
+              color: _AuraColors.shadowSoft,
+              blurRadius: 30,
+              spreadRadius: -10,
+              offset: Offset(0, 12),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Container(
+              height: 48,
+              padding: const EdgeInsets.symmetric(horizontal: 4),
+              decoration: BoxDecoration(
+                color: _AuraColors.blush.withValues(alpha: 0.72),
+                borderRadius: BorderRadius.circular(999),
+              ),
+              child: Row(
+                children: [
+                  _AuraQuantityButton(
+                    icon: AppIcons.remove_rounded,
+                    enabled: canDecrease,
+                    onTap: onDecrease,
+                  ),
+                  SizedBox(
+                    width: 22,
+                    child: Text(
+                      '$quantity',
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.cairo(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: _AuraColors.mauve,
+                      ),
+                    ),
+                  ),
+                  _AuraQuantityButton(
+                    icon: AppIcons.add_rounded,
+                    enabled: canIncrease,
+                    onTap: onIncrease,
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Opacity(
+                opacity: isPurchasable ? 1 : 0.5,
+                child: Material(
+                  color: _AuraColors.primary,
+                  borderRadius: BorderRadius.circular(999),
+                  child: InkWell(
+                    onTap: isPurchasable ? onAddToBag : null,
+                    borderRadius: BorderRadius.circular(999),
+                    child: SizedBox(
+                      height: 48,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 18),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              isPurchasable ? 'أضيفي إلى الحقيبة' : 'غير متوفر',
+                              style: GoogleFonts.cairo(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                                color: _AuraColors.surface,
+                              ),
+                            ),
+                            Text(
+                              _formatAuraMoney(total),
+                              style: GoogleFonts.cairo(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                                color: _AuraColors.surface,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _AuraQuantityButton extends StatelessWidget {
+  final IconData icon;
+  final bool enabled;
+  final VoidCallback onTap;
+
+  const _AuraQuantityButton({
+    required this.icon,
+    required this.enabled,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: enabled ? onTap : null,
+      customBorder: const CircleBorder(),
+      child: SizedBox(
+        width: 36,
+        height: 36,
+        child: Icon(
+          icon,
+          size: 15,
+          color: enabled
+              ? _AuraColors.mauve
+              : _AuraColors.textHint.withValues(alpha: 0.55),
+        ),
+      ),
+    );
+  }
+}
+
+// Retained as the legacy implementation for a low-risk rollback while the
+// Aura capsule above is active.
+// ignore: unused_element
 class _BottomBar extends StatelessWidget {
   final double total;
   final bool isPurchasable;
@@ -1679,10 +1885,10 @@ class _BottomBar extends StatelessWidget {
     return Container(
       decoration: const BoxDecoration(
         color: Colors.white,
-        border: Border(top: BorderSide(color: AppColors.divider)),
+        border: Border(top: BorderSide(color: _AuraColors.divider)),
         boxShadow: [
           BoxShadow(
-            color: AppColors.shadowCard,
+            color: _AuraColors.shadowCard,
             blurRadius: 30,
             spreadRadius: -6,
             offset: Offset(0, -8),
@@ -1703,8 +1909,8 @@ class _BottomBar extends StatelessWidget {
                     'الإجمالي',
                     style: GoogleFonts.cairo(
                       fontSize: 10.5,
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.taupe,
+                      fontWeight: FontWeight.w600,
+                      color: _AuraColors.taupe,
                       letterSpacing: 0.8,
                     ),
                   ),
@@ -1713,8 +1919,8 @@ class _BottomBar extends StatelessWidget {
                     '${total.toStringAsFixed(2)} د.ل',
                     style: GoogleFonts.cairo(
                       fontSize: 20,
-                      fontWeight: FontWeight.w800,
-                      color: AppColors.mauve,
+                      fontWeight: FontWeight.w600,
+                      color: _AuraColors.mauve,
                       height: 1,
                     ),
                   ),
@@ -1767,39 +1973,24 @@ class _RelatedProductCard extends StatelessWidget {
       ),
       child: Container(
         width: 160,
-        decoration: BoxDecoration(
-          color: AppColors.surface,
-          borderRadius: BorderRadius.circular(26),
-          border: Border.all(color: AppColors.rosePink.withValues(alpha: 0.08)),
-          boxShadow: const [
-            BoxShadow(
-              color: AppColors.shadowCard,
-              blurRadius: 18,
-              offset: Offset(0, 8),
-            ),
-          ],
-        ),
+        decoration: const BoxDecoration(color: Colors.transparent),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             SizedBox(
-              height: 150,
+              height: 200,
               width: double.infinity,
               child: Stack(
                 children: [
                   Positioned.fill(
                     child: DecoratedBox(
                       decoration: const BoxDecoration(
-                        color: AppColors.blush,
-                        borderRadius: BorderRadius.vertical(
-                          top: Radius.circular(26),
-                        ),
+                        color: _AuraColors.blush,
+                        borderRadius: BorderRadius.all(Radius.circular(16)),
                       ),
                       child: hasThumbnail
                           ? ClipRRect(
-                              borderRadius: const BorderRadius.vertical(
-                                top: Radius.circular(26),
-                              ),
+                              borderRadius: BorderRadius.circular(16),
                               child: Image.network(
                                 thumbnailUrl,
                                 fit: BoxFit.cover,
@@ -1811,7 +2002,7 @@ class _RelatedProductCard extends StatelessWidget {
                                       child: Icon(
                                         AppIcons.image_outlined,
                                         size: 42,
-                                        color: AppColors.primary.withValues(
+                                        color: _AuraColors.primary.withValues(
                                           alpha: 0.3,
                                         ),
                                       ),
@@ -1822,7 +2013,9 @@ class _RelatedProductCard extends StatelessWidget {
                               child: Icon(
                                 AppIcons.image_outlined,
                                 size: 42,
-                                color: AppColors.primary.withValues(alpha: 0.3),
+                                color: _AuraColors.primary.withValues(
+                                  alpha: 0.3,
+                                ),
                               ),
                             ),
                     ),
@@ -1844,8 +2037,8 @@ class _RelatedProductCard extends StatelessWidget {
                           product.pricing.isOnSale ? 'خصم' : 'مميز',
                           style: GoogleFonts.cairo(
                             fontSize: 9.5,
-                            fontWeight: FontWeight.w900,
-                            color: AppColors.roseGold,
+                            fontWeight: FontWeight.w600,
+                            color: _AuraColors.roseGold,
                             height: 1,
                           ),
                         ),
@@ -1868,14 +2061,14 @@ class _RelatedProductCard extends StatelessWidget {
                             );
                           },
                           child: Container(
-                            width: 32,
-                            height: 32,
+                            width: 36,
+                            height: 36,
                             decoration: BoxDecoration(
                               color: Colors.white.withValues(alpha: 0.85),
                               shape: BoxShape.circle,
                               boxShadow: const [
                                 BoxShadow(
-                                  color: AppColors.shadowCard,
+                                  color: _AuraColors.shadowCard,
                                   blurRadius: 10,
                                   offset: Offset(0, 4),
                                 ),
@@ -1886,7 +2079,7 @@ class _RelatedProductCard extends StatelessWidget {
                                   ? AppIcons.favorite_rounded
                                   : AppIcons.favorite_border_rounded,
                               size: 16,
-                              color: AppColors.roseGold,
+                              color: _AuraColors.roseGold,
                             ),
                           ),
                         );
@@ -1897,7 +2090,7 @@ class _RelatedProductCard extends StatelessWidget {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.all(14),
+              padding: const EdgeInsets.only(top: 12),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -1908,9 +2101,9 @@ class _RelatedProductCard extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                       style: GoogleFonts.cairo(
                         fontSize: 9,
-                        fontWeight: FontWeight.w700,
+                        fontWeight: FontWeight.w600,
                         letterSpacing: 2,
-                        color: AppColors.taupe,
+                        color: _AuraColors.taupe,
                       ),
                     ),
                     const SizedBox(height: 3),
@@ -1930,7 +2123,7 @@ class _RelatedProductCard extends StatelessWidget {
                       style: GoogleFonts.cairo(
                         fontSize: 11,
                         fontWeight: FontWeight.w500,
-                        color: AppColors.taupe,
+                        color: _AuraColors.taupe,
                         height: 1.2,
                       ),
                     ),
@@ -1945,13 +2138,13 @@ class _RelatedProductCard extends StatelessWidget {
                           children: [
                             Flexible(
                               child: Text(
-                                '${effectivePrice.toStringAsFixed(0)} د.ل',
+                                _formatAuraMoney(effectivePrice),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                                 style: GoogleFonts.cairo(
                                   fontSize: 14,
-                                  fontWeight: FontWeight.w900,
-                                  color: AppColors.mauve,
+                                  fontWeight: FontWeight.w600,
+                                  color: _AuraColors.mauve,
                                   height: 1,
                                 ),
                               ),
@@ -1959,11 +2152,11 @@ class _RelatedProductCard extends StatelessWidget {
                             if (product.pricing.isOnSale) ...[
                               const SizedBox(width: 5),
                               Text(
-                                product.pricing.price.toStringAsFixed(0),
+                                _formatAuraMoney(product.pricing.price),
                                 style: GoogleFonts.cairo(
                                   fontSize: 10.5,
                                   fontWeight: FontWeight.w600,
-                                  color: AppColors.textHint,
+                                  color: _AuraColors.textHint,
                                   decoration: TextDecoration.lineThrough,
                                   height: 1,
                                 ),
@@ -2014,7 +2207,7 @@ class _RelatedProductCard extends StatelessWidget {
                             width: 32,
                             height: 32,
                             decoration: const BoxDecoration(
-                              gradient: AppColors.roseGradient,
+                              gradient: _AuraColors.roseGradient,
                               shape: BoxShape.circle,
                             ),
                             alignment: Alignment.center,
@@ -2036,4 +2229,9 @@ class _RelatedProductCard extends StatelessWidget {
       ),
     );
   }
+}
+
+String _formatAuraMoney(double value) {
+  final decimals = value % 1 == 0 ? 0 : 2;
+  return '${value.toStringAsFixed(decimals)} د.ل';
 }

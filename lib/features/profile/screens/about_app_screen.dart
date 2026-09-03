@@ -10,12 +10,10 @@ import '../../../core/theme/app_colors.dart';
 class AboutAppScreen extends StatelessWidget {
   const AboutAppScreen({super.key});
 
-  static const String supportEmail = 'support@aila.ly';
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFFF8F7),
+      backgroundColor: AppColors.background,
       body: SafeArea(
         child: Column(
           children: [
@@ -23,7 +21,7 @@ class AboutAppScreen extends StatelessWidget {
             Expanded(
               child: ListView(
                 physics: const BouncingScrollPhysics(),
-                padding: const EdgeInsets.fromLTRB(20, 10, 20, 28),
+                padding: const EdgeInsets.fromLTRB(24, 10, 24, 28),
                 children: const [
                   _AboutHeroCard(),
                   SizedBox(height: 22),
@@ -50,7 +48,7 @@ class _AboutTopBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 6),
+      padding: const EdgeInsets.fromLTRB(24, 8, 24, 6),
       child: Row(
         children: [
           _CircleActionButton(
@@ -62,7 +60,7 @@ class _AboutTopBar extends StatelessWidget {
             'عن التطبيق',
             style: GoogleFonts.cairo(
               fontSize: 18,
-              fontWeight: FontWeight.w800,
+              fontWeight: FontWeight.w600,
               color: AppColors.textPrimary,
             ),
           ),
@@ -84,11 +82,11 @@ class _AboutHeroCard extends StatelessWidget {
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         color: AppColors.surface,
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: const Color(0xFFEFE3E6)),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.divider),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.035),
+            color: AppColors.textPrimary.withValues(alpha: 0.035),
             blurRadius: 18,
             offset: const Offset(0, 8),
           ),
@@ -96,14 +94,14 @@ class _AboutHeroCard extends StatelessWidget {
       ),
       child: Column(
         children: [
-          const StoreLogo(size: 82, fallbackText: 'AILA'),
+          const StoreLogo(size: 82, fallbackText: 'LUNORA'),
           const SizedBox(height: 18),
           Text(
             AppConstants.appName,
             textAlign: TextAlign.center,
             style: GoogleFonts.cairo(
               fontSize: 24,
-              fontWeight: FontWeight.w900,
+              fontWeight: FontWeight.w600,
               color: AppColors.textPrimary,
               height: 1.2,
             ),
@@ -193,9 +191,9 @@ class _FeatureCard extends StatelessWidget {
       height: 142,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFFEFE3E6)),
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.divider),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -213,7 +211,7 @@ class _FeatureCard extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
             style: GoogleFonts.cairo(
               fontSize: 15,
-              fontWeight: FontWeight.w800,
+              fontWeight: FontWeight.w600,
               color: AppColors.textPrimary,
             ),
           ),
@@ -250,9 +248,9 @@ class _AppInfoCard extends StatelessWidget {
 
         return Container(
           decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: const Color(0xFFEFE3E6)),
+            color: AppColors.surface,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: AppColors.divider),
           ),
           child: Column(
             children: [
@@ -270,8 +268,8 @@ class _AppInfoCard extends StatelessWidget {
               const _InfoDivider(),
               const _InfoRow(
                 icon: AppIcons.email_outlined,
-                title: 'بريد الدعم',
-                value: AboutAppScreen.supportEmail,
+                title: 'الدعم',
+                value: 'من داخل التطبيق',
               ),
             ],
           ),
@@ -310,7 +308,7 @@ class _InfoRow extends StatelessWidget {
               title,
               style: GoogleFonts.cairo(
                 fontSize: 14,
-                fontWeight: FontWeight.w700,
+                fontWeight: FontWeight.w600,
                 color: AppColors.textPrimary,
               ),
             ),
@@ -325,7 +323,7 @@ class _InfoRow extends StatelessWidget {
               textAlign: TextAlign.left,
               style: GoogleFonts.cairo(
                 fontSize: 13,
-                fontWeight: FontWeight.w700,
+                fontWeight: FontWeight.w600,
                 color: AppColors.textSecondary,
               ),
             ),
@@ -341,7 +339,7 @@ class _InfoDivider extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Divider(height: 1, color: Color(0xFFEFE3E6));
+    return const Divider(height: 1, color: AppColors.divider);
   }
 }
 
@@ -356,7 +354,7 @@ class _SectionTitle extends StatelessWidget {
       title,
       style: GoogleFonts.cairo(
         fontSize: 16,
-        fontWeight: FontWeight.w900,
+        fontWeight: FontWeight.w600,
         color: AppColors.textPrimary,
       ),
     );
@@ -378,12 +376,12 @@ class _CircleActionButton extends StatelessWidget {
         width: 42,
         height: 42,
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.surface,
           shape: BoxShape.circle,
-          border: Border.all(color: const Color(0xFFEFE3E6)),
+          border: Border.all(color: AppColors.divider),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.035),
+              color: AppColors.textPrimary.withValues(alpha: 0.035),
               blurRadius: 14,
               offset: const Offset(0, 5),
             ),

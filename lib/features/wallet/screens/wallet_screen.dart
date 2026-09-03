@@ -57,19 +57,19 @@ class _WalletScreenState extends State<WalletScreen> {
                 else if (wallet.summary != null) ...[
                   SliverToBoxAdapter(
                     child: Padding(
-                      padding: const EdgeInsets.fromLTRB(20, 10, 20, 0),
+                      padding: const EdgeInsets.fromLTRB(24, 10, 24, 0),
                       child: _WalletBalanceCard(summary: wallet.summary!),
                     ),
                   ),
                   SliverToBoxAdapter(
                     child: Padding(
-                      padding: const EdgeInsets.fromLTRB(20, 18, 20, 0),
+                      padding: const EdgeInsets.fromLTRB(24, 18, 24, 0),
                       child: _buildQuickActions(context, wallet.summary!),
                     ),
                   ),
                   SliverToBoxAdapter(
                     child: Padding(
-                      padding: const EdgeInsets.fromLTRB(20, 30, 20, 12),
+                      padding: const EdgeInsets.fromLTRB(24, 30, 24, 12),
                       child: _buildTransactionsHeader(context),
                     ),
                   ),
@@ -78,7 +78,7 @@ class _WalletScreenState extends State<WalletScreen> {
                   else
                     SliverToBoxAdapter(
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        padding: const EdgeInsets.symmetric(horizontal: 24),
                         child: _TransactionsCard(
                           transactions: wallet.summary!.recentTransactions,
                         ),
@@ -99,7 +99,7 @@ class _WalletScreenState extends State<WalletScreen> {
     return SafeArea(
       bottom: false,
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(20, 14, 20, 20),
+        padding: const EdgeInsets.fromLTRB(24, 14, 24, 20),
         child: Row(
           children: [
             _RoundIconButton(
@@ -115,7 +115,7 @@ class _WalletScreenState extends State<WalletScreen> {
                     'محفظتي',
                     style: GoogleFonts.cairo(
                       fontSize: 22,
-                      fontWeight: FontWeight.w800,
+                      fontWeight: FontWeight.w600,
                       color: AppColors.textPrimary,
                       height: 1.2,
                     ),
@@ -136,8 +136,8 @@ class _WalletScreenState extends State<WalletScreen> {
               width: 44,
               height: 44,
               decoration: BoxDecoration(
-                color: AppColors.blush,
-                borderRadius: BorderRadius.circular(15),
+                color: AppColors.secondary,
+                borderRadius: BorderRadius.circular(16),
               ),
               child: const Icon(
                 AppIcons.account_balance_wallet_rounded,
@@ -183,7 +183,7 @@ class _WalletScreenState extends State<WalletScreen> {
             'آخر الحركات',
             style: GoogleFonts.cairo(
               fontSize: 18,
-              fontWeight: FontWeight.w800,
+              fontWeight: FontWeight.w600,
               color: AppColors.textPrimary,
             ),
           ),
@@ -207,7 +207,7 @@ class _WalletScreenState extends State<WalletScreen> {
               width: 72,
               height: 72,
               decoration: const BoxDecoration(
-                color: AppColors.blush,
+                color: AppColors.secondary,
                 shape: BoxShape.circle,
               ),
               child: const Icon(
@@ -290,11 +290,7 @@ class _WalletBalanceCard extends StatelessWidget {
       child: Container(
         clipBehavior: Clip.antiAlias,
         decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            colors: [AppColors.mauve, Color(0xFF7C4450), AppColors.roseGold],
-            begin: Alignment.topRight,
-            end: Alignment.bottomLeft,
-          ),
+          color: AppColors.primary,
           borderRadius: BorderRadius.circular(28),
           boxShadow: const [
             BoxShadow(
@@ -311,7 +307,7 @@ class _WalletBalanceCard extends StatelessWidget {
               top: -78,
               child: _DecorativeCircle(
                 size: 190,
-                color: Colors.white.withValues(alpha: 0.07),
+                color: AppColors.surface.withValues(alpha: 0.07),
               ),
             ),
             Positioned(
@@ -319,7 +315,7 @@ class _WalletBalanceCard extends StatelessWidget {
               bottom: -76,
               child: _DecorativeCircle(
                 size: 180,
-                color: AppColors.rosePink.withValues(alpha: 0.18),
+                color: AppColors.neutral.withValues(alpha: 0.18),
               ),
             ),
             Padding(
@@ -333,25 +329,25 @@ class _WalletBalanceCard extends StatelessWidget {
                         width: 42,
                         height: 42,
                         decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.14),
-                          borderRadius: BorderRadius.circular(14),
+                          color: AppColors.surface.withValues(alpha: 0.14),
+                          borderRadius: BorderRadius.circular(16),
                           border: Border.all(
-                            color: Colors.white.withValues(alpha: 0.12),
+                            color: AppColors.surface.withValues(alpha: 0.12),
                           ),
                         ),
                         child: const Icon(
                           AppIcons.account_balance_wallet_outlined,
-                          color: Colors.white,
+                          color: AppColors.surface,
                           size: 21,
                         ),
                       ),
                       const SizedBox(width: 12),
                       Text(
-                        'AILA WALLET',
+                        'LUNORA WALLET',
                         style: GoogleFonts.cairo(
-                          color: Colors.white,
+                          color: AppColors.surface,
                           fontSize: 13,
-                          fontWeight: FontWeight.w800,
+                          fontWeight: FontWeight.w600,
                           letterSpacing: 1.2,
                         ),
                       ),
@@ -363,7 +359,7 @@ class _WalletBalanceCard extends StatelessWidget {
                   Text(
                     'الرصيد المتاح',
                     style: GoogleFonts.cairo(
-                      color: Colors.white.withValues(alpha: 0.72),
+                      color: AppColors.surface.withValues(alpha: 0.72),
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
                     ),
@@ -378,10 +374,10 @@ class _WalletBalanceCard extends StatelessWidget {
                         Text(
                           summary.balance.toStringAsFixed(2),
                           style: GoogleFonts.cairo(
-                            color: Colors.white,
+                            color: AppColors.surface,
                             fontSize: 38,
                             height: 1.1,
-                            fontWeight: FontWeight.w800,
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
                         const SizedBox(width: 9),
@@ -390,9 +386,9 @@ class _WalletBalanceCard extends StatelessWidget {
                           child: Text(
                             _currencyLabel(summary.currency),
                             style: GoogleFonts.cairo(
-                              color: Colors.white.withValues(alpha: 0.8),
+                              color: AppColors.surface.withValues(alpha: 0.8),
                               fontSize: 14,
-                              fontWeight: FontWeight.w700,
+                              fontWeight: FontWeight.w600,
                             ),
                           ),
                         ),
@@ -405,13 +401,13 @@ class _WalletBalanceCard extends StatelessWidget {
                       Icon(
                         AppIcons.verified_user_rounded,
                         size: 15,
-                        color: Colors.white.withValues(alpha: 0.76),
+                        color: AppColors.surface.withValues(alpha: 0.76),
                       ),
                       const SizedBox(width: 7),
                       Text(
-                        'دفع آمن وسريع مع AILA',
+                        'دفع آمن وسريع مع LUNORA',
                         style: GoogleFonts.cairo(
-                          color: Colors.white.withValues(alpha: 0.72),
+                          color: AppColors.surface.withValues(alpha: 0.72),
                           fontSize: 10.5,
                           fontWeight: FontWeight.w600,
                         ),
@@ -443,8 +439,8 @@ class _WalletStatus extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 6),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(20),
+        color: AppColors.surface.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(16),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -463,9 +459,9 @@ class _WalletStatus extends StatelessWidget {
           Text(
             enabled ? 'مفعّلة' : 'غير مفعّلة',
             style: GoogleFonts.cairo(
-              color: Colors.white,
+              color: AppColors.surface,
               fontSize: 9.5,
-              fontWeight: FontWeight.w700,
+              fontWeight: FontWeight.w600,
             ),
           ),
         ],
@@ -507,21 +503,21 @@ class _QuickAction extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final foreground = isPrimary ? Colors.white : AppColors.textPrimary;
+    final foreground = isPrimary ? AppColors.surface : AppColors.textPrimary;
 
     return Opacity(
       opacity: enabled ? 1 : 0.45,
       child: Material(
-        color: isPrimary ? AppColors.primary : Colors.white,
-        borderRadius: BorderRadius.circular(18),
+        color: isPrimary ? AppColors.primary : AppColors.surface,
+        borderRadius: BorderRadius.circular(16),
         child: InkWell(
           onTap: enabled ? onTap : null,
-          borderRadius: BorderRadius.circular(18),
+          borderRadius: BorderRadius.circular(16),
           child: Container(
             height: 58,
             padding: const EdgeInsets.symmetric(horizontal: 15),
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(18),
+              borderRadius: BorderRadius.circular(16),
               border: isPrimary
                   ? null
                   : Border.all(color: AppColors.divider.withValues(alpha: 0.9)),
@@ -538,7 +534,7 @@ class _QuickAction extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                     style: GoogleFonts.cairo(
                       fontSize: 12.5,
-                      fontWeight: FontWeight.w700,
+                      fontWeight: FontWeight.w600,
                       color: foreground,
                     ),
                   ),
@@ -562,8 +558,8 @@ class _TransactionsCard extends StatelessWidget {
     return Container(
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(24),
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(color: AppColors.divider.withValues(alpha: 0.8)),
       ),
       child: Column(
@@ -602,15 +598,15 @@ class _TransactionTile extends StatelessWidget {
             width: 44,
             height: 44,
             decoration: BoxDecoration(
-              color: isDeposit ? AppColors.blush : const Color(0xFFF4EFF0),
-              borderRadius: BorderRadius.circular(15),
+              color: isDeposit ? AppColors.secondary : AppColors.surfaceVariant,
+              borderRadius: BorderRadius.circular(16),
             ),
             child: Icon(
               isDeposit
                   ? AppIcons.arrow_downward_rounded
                   : AppIcons.arrow_upward_rounded,
               size: 20,
-              color: isDeposit ? AppColors.primary : AppColors.mauve,
+              color: isDeposit ? AppColors.primary : AppColors.textPrimary,
             ),
           ),
           const SizedBox(width: 13),
@@ -624,7 +620,7 @@ class _TransactionTile extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: GoogleFonts.cairo(
                     fontSize: 13,
-                    fontWeight: FontWeight.w700,
+                    fontWeight: FontWeight.w600,
                     color: AppColors.textPrimary,
                   ),
                 ),
@@ -650,7 +646,7 @@ class _TransactionTile extends StatelessWidget {
                 '${isDeposit ? '+' : '-'}${transaction.amount.toStringAsFixed(2)} د.ل',
                 style: GoogleFonts.cairo(
                   fontSize: 13,
-                  fontWeight: FontWeight.w800,
+                  fontWeight: FontWeight.w600,
                   color: isDeposit ? AppColors.success : AppColors.textPrimary,
                 ),
               ),
@@ -662,10 +658,10 @@ class _TransactionTile extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: GoogleFonts.cairo(
                     fontSize: 9,
-                    fontWeight: FontWeight.w700,
+                    fontWeight: FontWeight.w600,
                     color: transaction.isPending
                         ? AppColors.warning
-                        : AppColors.badge,
+                        : AppColors.error,
                   ),
                 ),
               ],
@@ -695,13 +691,13 @@ class _EmptyTransactions extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 0, 20, 30),
+      padding: const EdgeInsets.fromLTRB(24, 0, 24, 30),
       child: Container(
         width: double.infinity,
-        padding: const EdgeInsets.symmetric(vertical: 34, horizontal: 20),
+        padding: const EdgeInsets.symmetric(vertical: 34, horizontal: 24),
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(24),
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(16),
           border: Border.all(color: AppColors.divider.withValues(alpha: 0.8)),
         ),
         child: Column(
@@ -710,7 +706,7 @@ class _EmptyTransactions extends StatelessWidget {
               width: 62,
               height: 62,
               decoration: const BoxDecoration(
-                color: AppColors.blush,
+                color: AppColors.secondary,
                 shape: BoxShape.circle,
               ),
               child: const Icon(
@@ -724,7 +720,7 @@ class _EmptyTransactions extends StatelessWidget {
               'لا توجد حركات بعد',
               style: GoogleFonts.cairo(
                 fontSize: 14,
-                fontWeight: FontWeight.w700,
+                fontWeight: FontWeight.w600,
                 color: AppColors.textPrimary,
               ),
             ),
@@ -752,16 +748,16 @@ class _RoundIconButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(15),
+      color: AppColors.surface,
+      borderRadius: BorderRadius.circular(16),
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(15),
+        borderRadius: BorderRadius.circular(16),
         child: Container(
           width: 44,
           height: 44,
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(15),
+            borderRadius: BorderRadius.circular(16),
             border: Border.all(color: AppColors.divider),
           ),
           child: Icon(icon, size: 20, color: AppColors.textPrimary),
@@ -780,9 +776,9 @@ class _ProviderPicker extends StatelessWidget {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Container(
-        padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
+        padding: const EdgeInsets.fromLTRB(24, 12, 24, 24),
         decoration: const BoxDecoration(
-          color: Colors.white,
+          color: AppColors.surface,
           borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
         ),
         child: Column(
@@ -804,7 +800,7 @@ class _ProviderPicker extends StatelessWidget {
               'اختاري طريقة الشحن',
               style: GoogleFonts.cairo(
                 fontSize: 18,
-                fontWeight: FontWeight.w800,
+                fontWeight: FontWeight.w600,
                 color: AppColors.textPrimary,
               ),
             ),
@@ -814,18 +810,18 @@ class _ProviderPicker extends StatelessWidget {
                 padding: const EdgeInsets.only(bottom: 10),
                 child: Material(
                   color: AppColors.background,
-                  borderRadius: BorderRadius.circular(18),
+                  borderRadius: BorderRadius.circular(16),
                   child: ListTile(
                     onTap: () => Navigator.pop(context, provider),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(18),
+                      borderRadius: BorderRadius.circular(16),
                     ),
                     leading: Container(
                       width: 42,
                       height: 42,
                       decoration: BoxDecoration(
-                        color: AppColors.blush,
-                        borderRadius: BorderRadius.circular(14),
+                        color: AppColors.secondary,
+                        borderRadius: BorderRadius.circular(16),
                       ),
                       child: Icon(
                         provider.isBankTransfer
@@ -839,7 +835,7 @@ class _ProviderPicker extends StatelessWidget {
                       provider.label,
                       style: GoogleFonts.cairo(
                         fontSize: 13,
-                        fontWeight: FontWeight.w700,
+                        fontWeight: FontWeight.w600,
                         color: AppColors.textPrimary,
                       ),
                     ),

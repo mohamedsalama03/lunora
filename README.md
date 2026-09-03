@@ -1,6 +1,6 @@
-# AILA Beauty Boutique
+# LUNORA Beauty Boutique
 
-Flutter mobile app for AILA Beauty Boutique — a soft-luxury cosmetics store.
+Flutter mobile app for LUNORA Beauty Boutique — a soft-luxury cosmetics store.
 
 ## What It Includes
 
@@ -52,5 +52,5 @@ Then build:
 ```bash
 ./scripts/build_ios_release.sh
 ```
-"# aila-app" 
-"# aila_app" 
+"# lunora-app"
+"# lunora_app"

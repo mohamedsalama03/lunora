@@ -195,9 +195,27 @@ class TasameemApp extends StatelessWidget {
 }
 
 Widget _buildDirectionalApp(BuildContext context, Widget? child) {
-  return Directionality(
-    textDirection: TextDirection.rtl,
-    child: child ?? const SizedBox.shrink(),
+  final mediaQuery = MediaQuery.of(context);
+  final canvasWidth = math.min(mediaQuery.size.width, 440.0);
+
+  return ColoredBox(
+    color: AppColors.background,
+    child: Align(
+      alignment: Alignment.topCenter,
+      child: SizedBox(
+        width: canvasWidth,
+        height: mediaQuery.size.height,
+        child: MediaQuery(
+          data: mediaQuery.copyWith(
+            size: Size(canvasWidth, mediaQuery.size.height),
+          ),
+          child: Directionality(
+            textDirection: TextDirection.rtl,
+            child: child ?? const SizedBox.shrink(),
+          ),
+        ),
+      ),
+    ),
   );
 }
 
@@ -320,7 +338,7 @@ class _AppStartupGateState extends State<AppStartupGate> {
     _complete();
   }
 
-  /// Guests see the AILA onboarding on first launch only.
+  /// Guests see the LUNORA onboarding on first launch only.
   Future<void> _completeAsGuest() async {
     var seen = true;
     try {
@@ -417,11 +435,11 @@ class _StartupLoadingViewState extends State<_StartupLoadingView>
       value: const SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,
         statusBarIconBrightness: Brightness.dark,
-        systemNavigationBarColor: Color(0xFFFFF7F7),
+        systemNavigationBarColor: AppColors.background,
         systemNavigationBarIconBrightness: Brightness.dark,
       ),
       child: Scaffold(
-        backgroundColor: const Color(0xFFFFF7F7),
+        backgroundColor: AppColors.background,
         body: AnimatedBuilder(
           animation: _splashController,
           builder: (context, _) => CustomPaint(
@@ -432,17 +450,18 @@ class _StartupLoadingViewState extends State<_StartupLoadingView>
               child: Stack(
                 fit: StackFit.expand,
                 children: [
-                  const Align(
+                  Align(
                     alignment: Alignment.topCenter,
                     child: Padding(
-                      padding: EdgeInsets.only(top: 54),
+                      padding: const EdgeInsets.only(top: 54),
                       child: Text(
                         'SOFT LUXURY BEAUTY',
-                        style: TextStyle(
-                          color: Color(0xFFD98A9A),
+                        textDirection: TextDirection.ltr,
+                        style: AppTheme.brandFont(
+                          color: AppColors.accent,
                           fontSize: 10,
                           fontWeight: FontWeight.w600,
-                          letterSpacing: 5.2,
+                          letterSpacing: 4.4,
                         ),
                       ),
                     ),
@@ -491,7 +510,11 @@ class _LovableSplashBackdropPainter extends CustomPainter {
         ..shader = const LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: [Color(0xFFFFF8F8), Color(0xFFFFF2F4), Color(0xFFFDE8EB)],
+          colors: [
+            AppColors.background,
+            Color(0xFFF3EDE5),
+            AppColors.secondary,
+          ],
           stops: [0, 0.52, 1],
         ).createShader(bounds),
     );
@@ -501,19 +524,19 @@ class _LovableSplashBackdropPainter extends CustomPainter {
       canvas,
       center: Offset(size.width * 0.12, size.height * 0.05),
       radius: size.width * 0.68 * breath,
-      color: const Color(0x18D98A9A),
+      color: const Color(0x1AB88746),
     );
     _drawBloom(
       canvas,
       center: Offset(size.width * 0.91, size.height * 0.43),
       radius: size.width * 0.55,
-      color: const Color(0x10B76E79),
+      color: const Color(0x144A3428),
     );
     _drawBloom(
       canvas,
       center: Offset(size.width * 0.77, size.height * 1.02),
       radius: size.width * 0.63 * breath,
-      color: const Color(0x35D98A9A),
+      color: const Color(0x33C8B59E),
     );
   }
 
@@ -556,7 +579,7 @@ class _SplashDiamond extends StatelessWidget {
           width: 5,
           height: 5,
           decoration: BoxDecoration(
-            border: Border.all(color: const Color(0xFFD98A9A), width: 0.8),
+            border: Border.all(color: AppColors.accent, width: 0.8),
           ),
         ),
       ),
@@ -593,7 +616,7 @@ class _RitualHaloPainter extends CustomPainter {
       center,
       43,
       Paint()
-        ..color = const Color(0x18D98A9A)
+        ..color = const Color(0x1AB88746)
         ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 13),
     );
     canvas.drawArc(
@@ -606,7 +629,7 @@ class _RitualHaloPainter extends CustomPainter {
         ..strokeCap = StrokeCap.round
         ..strokeWidth = 4
         ..shader = const SweepGradient(
-          colors: [Color(0x22D98A9A), Color(0x88D98A9A), Color(0xFFF2C7CF)],
+          colors: [Color(0x224A3428), AppColors.accent, AppColors.secondary],
         ).createShader(outerRect),
     );
     canvas.drawCircle(
@@ -616,7 +639,7 @@ class _RitualHaloPainter extends CustomPainter {
         ..shader = const LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [Color(0xFFD98A9A), Color(0xFFB76E79)],
+          colors: [AppColors.accent, AppColors.primary],
         ).createShader(Rect.fromCircle(center: center, radius: 6)),
     );
   }
@@ -634,9 +657,9 @@ class _AnimatedAilaLogo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final wave = 0.5 + math.sin(progress * math.pi * 2) * 0.5;
-    final logoWidth = (MediaQuery.sizeOf(context).width * 0.62).clamp(
-      230.0,
-      300.0,
+    final logoWidth = (MediaQuery.sizeOf(context).width * 0.7).clamp(
+      240.0,
+      308.0,
     );
 
     return Transform.translate(
@@ -648,11 +671,36 @@ class _AnimatedAilaLogo extends StatelessWidget {
             sigmaX: (1 - wave) * 0.35,
             sigmaY: (1 - wave) * 0.35,
           ),
-          child: Image.asset(
-            'assets/images/splash_page.png',
+          child: SizedBox(
             width: logoWidth,
-            fit: BoxFit.contain,
-            filterQuality: FilterQuality.high,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'LUNORA',
+                  textDirection: TextDirection.ltr,
+                  style: AppTheme.brandFont(
+                    fontSize: 52,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textPrimary,
+                    letterSpacing: 10,
+                  ).copyWith(height: 1),
+                ),
+                const SizedBox(height: 12),
+                Container(width: 48, height: 1, color: AppColors.accent),
+                const SizedBox(height: 11),
+                Text(
+                  'BEAUTY BOUTIQUE',
+                  textDirection: TextDirection.ltr,
+                  style: AppTheme.brandFont(
+                    fontSize: 9,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textSecondary,
+                    letterSpacing: 3.2,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -686,7 +734,7 @@ class _RitualProgress extends StatelessWidget {
                 child: Divider(
                   height: 1,
                   thickness: 1,
-                  color: Color(0x55D9A6B0),
+                  color: Color(0x66C8B59E),
                 ),
               ),
               Align(
@@ -698,9 +746,9 @@ class _RitualProgress extends StatelessWidget {
                     decoration: const BoxDecoration(
                       gradient: LinearGradient(
                         colors: [
-                          Color(0x00B76E79),
-                          Color(0xFFB76E79),
-                          Color(0x00B76E79),
+                          Color(0x00B88746),
+                          AppColors.accent,
+                          Color(0x00B88746),
                         ],
                       ),
                     ),
@@ -711,13 +759,14 @@ class _RitualProgress extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 12),
-        const Text(
+        Text(
           'PREPARING YOUR RITUAL',
-          style: TextStyle(
-            color: Color(0xFF8B6F73),
+          textDirection: TextDirection.ltr,
+          style: AppTheme.brandFont(
+            color: AppColors.textSecondary,
             fontSize: 9,
             fontWeight: FontWeight.w500,
-            letterSpacing: 4.2,
+            letterSpacing: 3.4,
           ),
         ),
       ],
@@ -895,20 +944,17 @@ class _MainShellState extends State<MainShell> {
         });
 
         return Scaffold(
+          backgroundColor: AppColors.background,
+          extendBody: true,
           body: Container(
             decoration: const BoxDecoration(
               gradient: AppColors.backgroundGradient,
             ),
             child: IndexedStack(index: shell.currentIndex, children: screens),
           ),
-          bottomNavigationBar: DecoratedBox(
-            decoration: const BoxDecoration(
-              gradient: AppColors.backgroundGradient,
-            ),
-            child: CustomNavBar(
-              currentIndex: shell.currentIndex,
-              onTap: _handleNavigationTap,
-            ),
+          bottomNavigationBar: CustomNavBar(
+            currentIndex: shell.currentIndex,
+            onTap: _handleNavigationTap,
           ),
         );
       },

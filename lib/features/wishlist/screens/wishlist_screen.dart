@@ -1,21 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:app_aila/core/theme/app_icons.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 import '../../../core/models/product_model.dart';
 import '../../../core/navigation/app_shell_controller.dart';
-import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_icons.dart';
 import '../../../core/utils/app_notifications.dart';
-import '../../notifications/screens/notifications_screen.dart';
 import '../../cart/providers/cart_provider.dart';
 import '../../home/screens/product_detail_screen.dart';
 import '../providers/wishlist_provider.dart';
-
-// ─────────────────────────────────────────────────────────────
-// Wishlist Screen — AILA / Lovable layout (clean horizontal cards)
-// ─────────────────────────────────────────────────────────────
 
 class WishlistScreen extends StatefulWidget {
   const WishlistScreen({super.key});
@@ -25,68 +19,81 @@ class WishlistScreen extends StatefulWidget {
 }
 
 class _WishlistScreenState extends State<WishlistScreen> {
-  String _searchQuery = '';
+  String _query = '';
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: _WishlistColors.background,
       body: SafeArea(
         bottom: false,
         child: Consumer<WishlistProvider>(
-          builder: (context, wishlist, child) {
+          builder: (context, wishlist, _) {
             final allItems = wishlist.items;
-            final items = _searchQuery.isEmpty
+            final normalizedQuery = _query.trim().toLowerCase();
+            final visibleItems = normalizedQuery.isEmpty
                 ? allItems
-                : allItems
-                      .where(
-                        (item) => item.name.toLowerCase().contains(
-                          _searchQuery.toLowerCase(),
-                        ),
-                      )
-                      .toList();
+                : allItems.where((product) {
+                    final brand = product.brand?.name.toLowerCase() ?? '';
+                    final category = product.category?.name.toLowerCase() ?? '';
+                    return product.name.toLowerCase().contains(
+                          normalizedQuery,
+                        ) ||
+                        brand.contains(normalizedQuery) ||
+                        category.contains(normalizedQuery);
+                  }).toList();
 
-            return Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 18, 20, 0),
+            return CustomScrollView(
+              physics: const BouncingScrollPhysics(),
+              slivers: [
+                SliverToBoxAdapter(
                   child: _WishlistHeader(count: allItems.length),
                 ),
                 if (allItems.isNotEmpty) ...[
-                  const SizedBox(height: 16),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: _WishlistSearchField(
-                      onChanged: (value) =>
-                          setState(() => _searchQuery = value),
+                  const SliverToBoxAdapter(child: SizedBox(height: 24)),
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 24),
+                      child: _WishlistSearchField(
+                        onChanged: (value) => setState(() => _query = value),
+                      ),
                     ),
                   ),
-                ],
-                const SizedBox(height: 12),
-                Expanded(
-                  child: allItems.isEmpty
-                      ? const _EmptyWishlistState()
-                      : items.isEmpty
-                      ? Center(
-                          child: Text(
-                            'لا توجد نتائج مطابقة لبحثك',
-                            style: GoogleFonts.cairo(
-                              fontSize: 15,
-                              fontWeight: FontWeight.w600,
-                              color: AppColors.taupe,
-                            ),
+                  const SliverToBoxAdapter(child: SizedBox(height: 32)),
+                ] else
+                  const SliverToBoxAdapter(child: SizedBox(height: 16)),
+                if (allItems.isEmpty)
+                  const SliverFillRemaining(
+                    hasScrollBody: false,
+                    child: _EmptyWishlistState(),
+                  )
+                else if (visibleItems.isEmpty)
+                  const SliverFillRemaining(
+                    hasScrollBody: false,
+                    child: _WishlistMessage(
+                      icon: AppIcons.search_off_rounded,
+                      title: 'لا توجد نتائج',
+                      message: 'جرّبي اسمًا مختلفًا للقطعة أو العلامة.',
+                    ),
+                  )
+                else
+                  SliverPadding(
+                    padding: const EdgeInsets.fromLTRB(24, 0, 24, 120),
+                    sliver: SliverGrid(
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            crossAxisSpacing: 16,
+                            mainAxisSpacing: 32,
+                            childAspectRatio: .54,
                           ),
-                        )
-                      : ListView.separated(
-                          physics: const BouncingScrollPhysics(),
-                          padding: const EdgeInsets.fromLTRB(20, 4, 20, 120),
-                          itemCount: items.length,
-                          separatorBuilder: (context, index) =>
-                              const SizedBox(height: 14),
-                          itemBuilder: (context, index) =>
-                              _WishlistCard(product: items[index]),
-                        ),
-                ),
+                      delegate: SliverChildBuilderDelegate(
+                        (context, index) =>
+                            _WishlistProductCard(product: visibleItems[index]),
+                        childCount: visibleItems.length,
+                      ),
+                    ),
+                  ),
               ],
             );
           },
@@ -96,151 +103,105 @@ class _WishlistScreenState extends State<WishlistScreen> {
   }
 }
 
-// ─────────────────────────────────────────────────────────────
-// Header
-// ─────────────────────────────────────────────────────────────
-
 class _WishlistHeader extends StatelessWidget {
-  final int count;
-
   const _WishlistHeader({required this.count});
+
+  final int count;
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'المفضلة',
-              style: GoogleFonts.cairo(
-                fontSize: 26,
-                fontWeight: FontWeight.w900,
-                color: AppColors.mauve,
-                height: 1.15,
-              ),
-            ),
-            const SizedBox(height: 2),
-            Text(
-              '$count قطعة محفوظة',
-              style: GoogleFonts.cairo(
-                fontSize: 12.5,
-                fontWeight: FontWeight.w500,
-                color: AppColors.taupe,
-              ),
-            ),
-          ],
-        ),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(30),
-            boxShadow: const [
-              BoxShadow(
-                color: AppColors.shadowCard,
-                blurRadius: 12,
-                offset: Offset(0, 4),
-              ),
-            ],
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              GestureDetector(
-                onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const NotificationsScreen(),
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'قائمتك الخاصة',
+                  style: _wishlistText(
+                    size: 11,
+                    weight: FontWeight.w500,
+                    color: _WishlistColors.mutedText,
+                    letterSpacing: 1.5,
                   ),
                 ),
-                child: Stack(
-                  clipBehavior: Clip.none,
-                  children: [
-                    const Icon(
-                      AppIcons.notifications_none_rounded,
-                      color: AppColors.mauve,
-                      size: 24,
-                    ),
-                    Positioned(
-                      right: 2,
-                      top: 2,
-                      child: Container(
-                        width: 8,
-                        height: 8,
-                        decoration: const BoxDecoration(
-                          color: AppColors.rosePink,
-                          shape: BoxShape.circle,
-                        ),
-                      ),
-                    ),
-                  ],
+                const SizedBox(height: 4),
+                Text(
+                  'القطع المحفوظة',
+                  style: _wishlistText(size: 30, weight: FontWeight.w500),
                 ),
-              ),
-              const SizedBox(width: 14),
-              GestureDetector(
-                onTap: () => context.read<AppShellController>().setIndex(
-                  AppShellController.cartIndex,
+                const SizedBox(height: 5),
+                Text(
+                  '$count ${count == 1 ? 'قطعة' : 'قطع'} · محفوظة لوقت لاحق',
+                  style: _wishlistText(
+                    size: 13,
+                    color: _WishlistColors.mutedText,
+                  ),
                 ),
-                child: const Icon(
-                  AppIcons.shopping_cart_outlined,
-                  color: AppColors.mauve,
-                  size: 24,
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
-      ],
+          const SizedBox(width: 12),
+          Material(
+            color: _WishlistColors.surface,
+            shape: const CircleBorder(
+              side: BorderSide(color: _WishlistColors.border),
+            ),
+            child: InkWell(
+              onTap: () => context.read<AppShellController>().setIndex(
+                AppShellController.cartIndex,
+              ),
+              customBorder: const CircleBorder(),
+              child: const SizedBox(
+                width: 40,
+                height: 40,
+                child: Icon(
+                  AppIcons.shopping_bag_outlined,
+                  size: 19,
+                  color: _WishlistColors.text,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
 
 class _WishlistSearchField extends StatelessWidget {
-  final ValueChanged<String> onChanged;
-
   const _WishlistSearchField({required this.onChanged});
+
+  final ValueChanged<String> onChanged;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 52,
+      height: 50,
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: AppColors.divider),
-        boxShadow: const [
-          BoxShadow(
-            color: AppColors.shadowCard,
-            blurRadius: 12,
-            offset: Offset(0, 5),
-          ),
-        ],
+        color: _WishlistColors.surface,
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: _WishlistColors.border),
       ),
       child: TextField(
         onChanged: onChanged,
-        onTapOutside: (_) => FocusScope.of(context).unfocus(),
-        style: GoogleFonts.cairo(
-          fontSize: 14,
-          fontWeight: FontWeight.w600,
-          color: AppColors.mauve,
-        ),
+        onTapOutside: (_) => FocusManager.instance.primaryFocus?.unfocus(),
+        cursorColor: _WishlistColors.primary,
+        style: _wishlistText(size: 14, weight: FontWeight.w500),
         decoration: InputDecoration(
-          hintText: 'ابحثي في المفضلة...',
-          hintStyle: GoogleFonts.cairo(
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-            color: AppColors.textHint,
-          ),
-          border: InputBorder.none,
+          hintText: 'ابحثي في القطع المحفوظة…',
+          hintStyle: _wishlistText(size: 13, color: _WishlistColors.mutedText),
           prefixIcon: const Icon(
             AppIcons.search_rounded,
-            color: AppColors.roseGold,
-            size: 22,
+            size: 19,
+            color: _WishlistColors.mutedText,
           ),
+          border: InputBorder.none,
+          enabledBorder: InputBorder.none,
+          focusedBorder: InputBorder.none,
           contentPadding: const EdgeInsets.symmetric(vertical: 14),
         ),
       ),
@@ -248,185 +209,143 @@ class _WishlistSearchField extends StatelessWidget {
   }
 }
 
-// ─────────────────────────────────────────────────────────────
-// Wishlist card — image · info · (price + trash + Add)
-// ─────────────────────────────────────────────────────────────
+class _WishlistProductCard extends StatelessWidget {
+  const _WishlistProductCard({required this.product});
 
-class _WishlistCard extends StatelessWidget {
   final ProductModel product;
-
-  const _WishlistCard({required this.product});
 
   @override
   Widget build(BuildContext context) {
-    final hasImage =
-        product.thumbnail != null && product.thumbnail!.trim().isNotEmpty;
-    final eyebrow = (product.category?.name ?? product.brand?.name)?.trim();
-    final subtitle = product.shortDescription?.trim();
-    final inStock = product.isPurchasable;
+    final label = (product.category?.name ?? product.brand?.name ?? 'لونورا')
+        .trim();
+    final showSale =
+        product.pricing.isOnSale &&
+        product.pricing.price > product.pricing.effectivePrice;
 
-    return GestureDetector(
-      onTap: () {
-        HapticFeedback.selectionClick();
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => ProductDetailScreen(product: product),
-          ),
-        );
-      },
-      child: Container(
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(26),
-          boxShadow: const [
-            BoxShadow(
-              color: AppColors.shadowCard,
-              blurRadius: 24,
-              offset: Offset(0, 10),
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () {
+          HapticFeedback.selectionClick();
+          Navigator.of(context).push(
+            MaterialPageRoute<void>(
+              builder: (_) => ProductDetailScreen(product: product),
             ),
-          ],
-        ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
+          );
+        },
+        borderRadius: BorderRadius.circular(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Image
-            Container(
-              width: 92,
-              height: 92,
-              clipBehavior: Clip.antiAlias,
-              decoration: BoxDecoration(
-                gradient: AppColors.blushGradient,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: hasImage
-                  ? Image.network(
-                      product.thumbnail!,
-                      fit: BoxFit.cover,
-                      cacheWidth: 280,
-                      filterQuality: FilterQuality.low,
-                      gaplessPlayback: true,
-                      errorBuilder: (_, e, st) => Icon(
-                        AppIcons.image_not_supported_outlined,
-                        color: AppColors.roseGold.withValues(alpha: 0.5),
-                      ),
-                    )
-                  : Icon(
-                      AppIcons.inventory_2_outlined,
-                      size: 34,
-                      color: AppColors.roseGold.withValues(alpha: 0.5),
-                    ),
-            ),
-            const SizedBox(width: 14),
-            // Info
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  if (eyebrow != null && eyebrow.isNotEmpty) ...[
-                    Text(
-                      eyebrow.toUpperCase(),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: GoogleFonts.cairo(
-                        fontSize: 9,
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: 2,
-                        color: AppColors.taupe,
-                      ),
-                    ),
-                    const SizedBox(height: 3),
-                  ],
-                  Text(
-                    product.name,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: GoogleFonts.cairo(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w800,
-                      color: AppColors.mauve,
-                      height: 1.2,
-                    ),
-                  ),
-                  if (subtitle != null && subtitle.isNotEmpty) ...[
-                    const SizedBox(height: 2),
-                    Text(
-                      subtitle,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: GoogleFonts.cairo(
-                        fontSize: 11.5,
-                        fontWeight: FontWeight.w500,
-                        color: AppColors.taupe,
-                      ),
-                    ),
-                  ],
-                  const SizedBox(height: 10),
-                  Row(
-                    children: [
-                      Text(
-                        _formatPrice(product.pricing.effectivePrice),
-                        style: GoogleFonts.cairo(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w900,
-                          color: AppColors.roseGold,
-                          height: 1,
+            AspectRatio(
+              aspectRatio: 4 / 5,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(16),
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    _WishlistNetworkImage(url: product.thumbnail),
+                    if (showSale)
+                      PositionedDirectional(
+                        start: 12,
+                        top: 12,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 9,
+                            vertical: 5,
+                          ),
+                          decoration: BoxDecoration(
+                            color: _WishlistColors.background.withValues(
+                              alpha: .9,
+                            ),
+                            borderRadius: BorderRadius.circular(999),
+                          ),
+                          child: Text(
+                            '−${product.pricing.discountPercentage}%',
+                            style: _wishlistText(
+                              size: 10,
+                              weight: FontWeight.w500,
+                            ),
+                          ),
                         ),
                       ),
-                      const Spacer(),
-                      // Remove from wishlist
-                      GestureDetector(
+                    PositionedDirectional(
+                      end: 12,
+                      top: 12,
+                      child: _WishlistImageButton(
+                        icon: AppIcons.favorite_rounded,
+                        color: _WishlistColors.accent,
+                        tooltip: 'إزالة من المفضلة',
                         onTap: () {
                           HapticFeedback.lightImpact();
                           context.read<WishlistProvider>().removeFavorite(
                             product.id,
                           );
+                          AppNotifications.showSuccess(
+                            context,
+                            'تمت الإزالة من المفضلة',
+                          );
                         },
-                        child: Container(
-                          width: 34,
-                          height: 34,
-                          decoration: const BoxDecoration(
-                            color: AppColors.blush,
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Icon(
-                            AppIcons.delete_outline_rounded,
-                            size: 17,
-                            color: AppColors.roseGold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: _wishlistText(size: 11, color: _WishlistColors.mutedText),
+            ),
+            const SizedBox(height: 3),
+            Text(
+              product.name,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: _wishlistText(
+                size: 14,
+                weight: FontWeight.w500,
+                height: 1.35,
+              ),
+            ),
+            const SizedBox(height: 7),
+            Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        _formatPrice(product.pricing.effectivePrice),
+                        maxLines: 1,
+                        overflow: TextOverflow.fade,
+                        style: _wishlistText(size: 14, weight: FontWeight.w500),
+                      ),
+                      if (showSale)
+                        Text(
+                          _formatPrice(product.pricing.price),
+                          maxLines: 1,
+                          style: _wishlistText(
+                            size: 10,
+                            color: _WishlistColors.mutedText,
+                            decoration: TextDecoration.lineThrough,
                           ),
                         ),
-                      ),
-                      const SizedBox(width: 8),
-                      // Add to cart
-                      GestureDetector(
-                        onTap: inStock ? () => _addToCart(context) : null,
-                        child: Opacity(
-                          opacity: inStock ? 1 : 0.5,
-                          child: Container(
-                            height: 34,
-                            padding: const EdgeInsets.symmetric(horizontal: 16),
-                            alignment: Alignment.center,
-                            decoration: BoxDecoration(
-                              gradient: AppColors.roseGradient,
-                              borderRadius: BorderRadius.circular(30),
-                            ),
-                            child: Text(
-                              'إضافة',
-                              style: GoogleFonts.cairo(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w700,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
                     ],
                   ),
-                ],
-              ),
+                ),
+                const SizedBox(width: 6),
+                _WishlistImageButton(
+                  icon: AppIcons.shopping_bag_outlined,
+                  color: _WishlistColors.onPrimary,
+                  backgroundColor: _WishlistColors.primary,
+                  tooltip: 'إضافة إلى السلة',
+                  enabled: product.isPurchasable,
+                  onTap: () => _addToCart(context),
+                ),
+              ],
             ),
           ],
         ),
@@ -437,9 +356,8 @@ class _WishlistCard extends StatelessWidget {
   void _addToCart(BuildContext context) {
     HapticFeedback.lightImpact();
     if (product.hasPendingVariantStock) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
+      Navigator.of(context).push(
+        MaterialPageRoute<void>(
           builder: (_) => ProductDetailScreen(product: product),
         ),
       );
@@ -455,15 +373,14 @@ class _WishlistCard extends StatelessWidget {
         imageUrl: product.thumbnail ?? '',
         maxQuantity: product.maxPurchasableQuantity,
         isAvailable: product.isPurchasable,
-        quantity: 1,
       ),
     );
     if (!result.didChange) {
       AppNotifications.showError(
         context,
         result.isLimitReached
-            ? 'الكمية المتاحة حالياً ${result.maxQuantity ?? product.maxPurchasableQuantity} فقط'
-            : 'المنتج غير متوفر حالياً',
+            ? 'الكمية المتاحة ${result.maxQuantity ?? product.maxPurchasableQuantity} فقط'
+            : 'المنتج غير متوفر حاليًا',
       );
       return;
     }
@@ -471,9 +388,86 @@ class _WishlistCard extends StatelessWidget {
   }
 }
 
-// ─────────────────────────────────────────────────────────────
-// Empty State
-// ─────────────────────────────────────────────────────────────
+class _WishlistImageButton extends StatelessWidget {
+  const _WishlistImageButton({
+    required this.icon,
+    required this.color,
+    required this.tooltip,
+    required this.onTap,
+    this.backgroundColor,
+    this.enabled = true,
+  });
+
+  final IconData icon;
+  final Color color;
+  final String tooltip;
+  final VoidCallback onTap;
+  final Color? backgroundColor;
+  final bool enabled;
+
+  @override
+  Widget build(BuildContext context) {
+    return Opacity(
+      opacity: enabled ? 1 : .42,
+      child: Tooltip(
+        message: tooltip,
+        child: Material(
+          color:
+              backgroundColor ??
+              _WishlistColors.background.withValues(alpha: .9),
+          shape: const CircleBorder(),
+          child: InkWell(
+            onTap: enabled ? onTap : null,
+            customBorder: const CircleBorder(),
+            child: SizedBox(
+              width: 36,
+              height: 36,
+              child: Icon(icon, size: 18, color: color),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _WishlistNetworkImage extends StatelessWidget {
+  const _WishlistNetworkImage({required this.url});
+
+  final String? url;
+
+  @override
+  Widget build(BuildContext context) {
+    final normalized = url?.trim();
+    if (normalized == null || normalized.isEmpty) {
+      return const _WishlistImageFallback();
+    }
+    return Image.network(
+      normalized,
+      fit: BoxFit.cover,
+      filterQuality: FilterQuality.medium,
+      errorBuilder: (_, _, _) => const _WishlistImageFallback(),
+    );
+  }
+}
+
+class _WishlistImageFallback extends StatelessWidget {
+  const _WishlistImageFallback();
+
+  @override
+  Widget build(BuildContext context) {
+    return ColoredBox(
+      color: _WishlistColors.secondary.withValues(alpha: .65),
+      child: Center(
+        child: Icon(
+          AppIcons.inventory_2_outlined,
+          size: 34,
+          color: _WishlistColors.primary.withValues(alpha: .45),
+        ),
+      ),
+    );
+  }
+}
 
 class _EmptyWishlistState extends StatelessWidget {
   const _EmptyWishlistState();
@@ -486,60 +480,50 @@ class _EmptyWishlistState extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Container(
-              width: 110,
-              height: 110,
-              decoration: const BoxDecoration(
-                gradient: AppColors.blushGradient,
-                shape: BoxShape.circle,
-              ),
+            const CircleAvatar(
+              radius: 44,
+              backgroundColor: _WishlistColors.secondary,
               child: Icon(
                 AppIcons.favorite_border_rounded,
-                size: 54,
-                color: AppColors.roseGold.withValues(alpha: 0.8),
+                size: 36,
+                color: _WishlistColors.primary,
+              ),
+            ),
+            const SizedBox(height: 22),
+            Text(
+              'لا توجد قطع محفوظة',
+              style: _wishlistText(size: 20, weight: FontWeight.w500),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'احفظي القطع التي تحبينها لتجديها هنا بسهولة.',
+              textAlign: TextAlign.center,
+              style: _wishlistText(
+                size: 13,
+                color: _WishlistColors.mutedText,
+                height: 1.65,
               ),
             ),
             const SizedBox(height: 24),
-            Text(
-              'المفضلة فارغة',
-              style: GoogleFonts.cairo(
-                fontSize: 22,
-                fontWeight: FontWeight.w900,
-                color: AppColors.mauve,
-              ),
-            ),
-            const SizedBox(height: 10),
-            Text(
-              'احفظي المنتجات التي تعجبك وارجعي إليها لاحقاً بسهولة.',
-              textAlign: TextAlign.center,
-              style: GoogleFonts.cairo(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                color: AppColors.taupe,
-                height: 1.7,
-              ),
-            ),
-            const SizedBox(height: 28),
-            ElevatedButton.icon(
+            FilledButton.icon(
               onPressed: () => context.read<AppShellController>().goHome(),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 28,
-                  vertical: 16,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(30),
-                ),
+              style: FilledButton.styleFrom(
+                backgroundColor: _WishlistColors.primary,
+                foregroundColor: _WishlistColors.onPrimary,
                 elevation: 0,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 22,
+                  vertical: 13,
+                ),
+                shape: const StadiumBorder(),
               ),
-              icon: const Icon(AppIcons.explore_rounded, size: 20),
+              icon: const Icon(AppIcons.arrow_back_rounded, size: 17),
               label: Text(
                 'استكشفي المنتجات',
-                style: GoogleFonts.cairo(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w800,
+                style: _wishlistText(
+                  size: 13,
+                  weight: FontWeight.w500,
+                  color: _WishlistColors.onPrimary,
                 ),
               ),
             ),
@@ -550,11 +534,82 @@ class _EmptyWishlistState extends StatelessWidget {
   }
 }
 
-// ─────────────────────────────────────────────────────────────
-// Helpers
-// ─────────────────────────────────────────────────────────────
+class _WishlistMessage extends StatelessWidget {
+  const _WishlistMessage({
+    required this.icon,
+    required this.title,
+    required this.message,
+  });
+
+  final IconData icon;
+  final String title;
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            CircleAvatar(
+              radius: 34,
+              backgroundColor: _WishlistColors.secondary,
+              child: Icon(icon, color: _WishlistColors.primary, size: 28),
+            ),
+            const SizedBox(height: 18),
+            Text(
+              title,
+              style: _wishlistText(size: 18, weight: FontWeight.w500),
+            ),
+            const SizedBox(height: 7),
+            Text(
+              message,
+              textAlign: TextAlign.center,
+              style: _wishlistText(size: 13, color: _WishlistColors.mutedText),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _WishlistColors {
+  const _WishlistColors._();
+
+  static const background = Color(0xFFF8F5F0);
+  static const surface = Color(0xFFFCFAF6);
+  static const primary = Color(0xFF4A3428);
+  static const onPrimary = Color(0xFFFFFBF5);
+  static const secondary = Color(0xFFEADCC8);
+  static const text = Color(0xFF2E211B);
+  static const mutedText = Color(0xFF6D5A4D);
+  static const border = Color(0xFFE4DBCE);
+  static const accent = Color(0xFFB88746);
+}
+
+TextStyle _wishlistText({
+  required double size,
+  FontWeight weight = FontWeight.w400,
+  Color color = _WishlistColors.text,
+  double? height,
+  double? letterSpacing,
+  TextDecoration? decoration,
+}) {
+  return GoogleFonts.cairo(
+    fontSize: size,
+    fontWeight: weight,
+    color: color,
+    height: height,
+    letterSpacing: letterSpacing,
+    decoration: decoration,
+    decorationColor: color,
+  );
+}
 
 String _formatPrice(double value) {
-  final hasDecimals = value % 1 != 0;
-  return '${value.toStringAsFixed(hasDecimals ? 2 : 0)} د.ل';
+  final decimals = value % 1 == 0 ? 0 : 2;
+  return '${value.toStringAsFixed(decimals)} د.ل';
 }

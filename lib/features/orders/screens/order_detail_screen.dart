@@ -115,7 +115,7 @@ class _TopBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 14, 20, 12),
+      padding: const EdgeInsets.fromLTRB(24, 14, 24, 12),
       child: Row(
         children: [
           _CircleActionButton(
@@ -131,7 +131,7 @@ class _TopBar extends StatelessWidget {
                   'تفاصيل الطلب',
                   style: GoogleFonts.cairo(
                     fontSize: 21,
-                    fontWeight: FontWeight.w800,
+                    fontWeight: FontWeight.w600,
                     color: AppColors.textPrimary,
                     height: 1.2,
                   ),
@@ -174,16 +174,16 @@ class _CircleActionButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(15),
+      color: AppColors.surface,
+      shape: const CircleBorder(),
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(15),
+        customBorder: const CircleBorder(),
         child: Container(
-          width: 44,
-          height: 44,
+          width: 40,
+          height: 40,
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(15),
+            shape: BoxShape.circle,
             border: Border.all(color: AppColors.divider),
           ),
           child: Center(
@@ -227,7 +227,7 @@ class _OrderDetailBody extends StatelessWidget {
       onRefresh: onRefresh,
       color: AppColors.primary,
       child: ListView(
-        padding: const EdgeInsets.fromLTRB(18, 8, 18, 36),
+        padding: const EdgeInsets.fromLTRB(24, 8, 24, 36),
         physics: const BouncingScrollPhysics(
           parent: AlwaysScrollableScrollPhysics(),
         ),
@@ -284,10 +284,10 @@ class _OrderHero extends StatelessWidget {
     final statusColor = _statusColor(order.status);
 
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(24),
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(color: AppColors.divider.withValues(alpha: 0.9)),
         boxShadow: const [
           BoxShadow(
@@ -306,8 +306,8 @@ class _OrderHero extends StatelessWidget {
                 width: 44,
                 height: 44,
                 decoration: BoxDecoration(
-                  color: AppColors.blush,
-                  borderRadius: BorderRadius.circular(14),
+                  color: AppColors.secondary,
+                  borderRadius: BorderRadius.circular(16),
                 ),
                 child: const Icon(
                   AppIcons.receipt_long_outlined,
@@ -320,7 +320,7 @@ class _OrderHero extends StatelessWidget {
                 'ملخص الطلب',
                 style: GoogleFonts.cairo(
                   fontSize: 13,
-                  fontWeight: FontWeight.w700,
+                  fontWeight: FontWeight.w600,
                   color: AppColors.textSecondary,
                 ),
               ),
@@ -346,7 +346,7 @@ class _OrderHero extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
               style: GoogleFonts.cairo(
                 fontSize: 22,
-                fontWeight: FontWeight.w800,
+                fontWeight: FontWeight.w600,
                 color: AppColors.textPrimary,
                 height: 1.1,
               ),
@@ -357,7 +357,7 @@ class _OrderHero extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
             decoration: BoxDecoration(
               color: AppColors.surfaceVariant,
-              borderRadius: BorderRadius.circular(17),
+              borderRadius: BorderRadius.circular(16),
             ),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -379,7 +379,7 @@ class _OrderHero extends StatelessWidget {
                         currency: currency,
                         style: GoogleFonts.cairo(
                           fontSize: 19,
-                          fontWeight: FontWeight.w800,
+                          fontWeight: FontWeight.w600,
                           color: AppColors.textPrimary,
                         ),
                       ),
@@ -402,7 +402,7 @@ class _OrderHero extends StatelessWidget {
                         createdAt,
                         style: GoogleFonts.cairo(
                           fontSize: 12,
-                          fontWeight: FontWeight.w700,
+                          fontWeight: FontWeight.w600,
                           color: AppColors.textPrimary,
                         ),
                       ),
@@ -430,7 +430,7 @@ class _HeroStatusPill extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 6),
       decoration: BoxDecoration(
         color: dotColor.withValues(alpha: 0.10),
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(color: dotColor.withValues(alpha: 0.18)),
       ),
       child: Row(
@@ -449,7 +449,7 @@ class _HeroStatusPill extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
               style: GoogleFonts.cairo(
                 fontSize: 9.5,
-                fontWeight: FontWeight.w700,
+                fontWeight: FontWeight.w600,
                 color: dotColor,
               ),
             ),
@@ -514,7 +514,7 @@ class _OrderProgressTimeline extends StatelessWidget {
                       height: 2.2,
                       color: isDone
                           ? AppColors.primary.withValues(alpha: 0.75)
-                          : const Color(0xFFE6D7DA),
+                          : AppColors.divider,
                     ),
                   );
                 }),
@@ -571,13 +571,13 @@ class _TimelineStep extends StatelessWidget {
         : AppColors.primary;
     final circleColor = isEnabled || (isCancelled && isActive)
         ? activeColor
-        : Colors.white;
+        : AppColors.surface;
     final borderColor = isEnabled || (isCancelled && isActive)
         ? activeColor
-        : const Color(0xFFE6D7DA);
+        : AppColors.divider;
     final iconColor = isEnabled || (isCancelled && isActive)
-        ? Colors.white
-        : const Color(0xFFC9B3B7);
+        ? AppColors.surface
+        : AppColors.neutral;
 
     return Column(
       children: [
@@ -613,8 +613,8 @@ class _TimelineStep extends StatelessWidget {
           style: GoogleFonts.cairo(
             fontSize: 11.5,
             height: 1.25,
-            fontWeight: isEnabled ? FontWeight.w900 : FontWeight.w700,
-            color: isEnabled ? AppColors.textPrimary : const Color(0xFF9E868B),
+            fontWeight: isEnabled ? FontWeight.w600 : FontWeight.w600,
+            color: isEnabled ? AppColors.textPrimary : AppColors.textHint,
           ),
         ),
       ],
@@ -658,7 +658,7 @@ class _AwaitingGatewayBanner extends StatelessWidget {
           'تحديث',
           style: GoogleFonts.cairo(
             fontSize: 12,
-            fontWeight: FontWeight.w900,
+            fontWeight: FontWeight.w600,
             color: AppColors.primary,
           ),
         ),
@@ -688,7 +688,7 @@ class _NoticeCard extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       decoration: BoxDecoration(
         color: background,
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(16),
       ),
       child: Row(
         children: [
@@ -699,7 +699,7 @@ class _NoticeCard extends StatelessWidget {
               text,
               style: GoogleFonts.cairo(
                 fontSize: 12.5,
-                fontWeight: FontWeight.w800,
+                fontWeight: FontWeight.w600,
                 color: AppColors.textPrimary,
                 height: 1.4,
               ),
@@ -740,7 +740,7 @@ class _ShippingCard extends StatelessWidget {
         children: [
           _DetailLine(
             text: shipping.fullName.isNotEmpty ? shipping.fullName : 'غير محدد',
-            weight: FontWeight.w800,
+            weight: FontWeight.w600,
             color: AppColors.textPrimary,
           ),
           if (shipping.phone.isNotEmpty) ...[
@@ -751,7 +751,7 @@ class _ShippingCard extends StatelessWidget {
               textAlign: TextAlign.right,
               style: GoogleFonts.cairo(
                 fontSize: 14,
-                fontWeight: FontWeight.w800,
+                fontWeight: FontWeight.w600,
                 color: AppColors.textPrimary,
               ),
             ),
@@ -793,7 +793,7 @@ class _ProductsCard extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       child: Divider(
                         height: 1,
-                        color: const Color(0xFFEFE3E6).withValues(alpha: 0.9),
+                        color: AppColors.divider.withValues(alpha: 0.9),
                       ),
                     ),
                 ],
@@ -829,7 +829,7 @@ class _ProductRow extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
                 style: GoogleFonts.cairo(
                   fontSize: 14,
-                  fontWeight: FontWeight.w900,
+                  fontWeight: FontWeight.w600,
                   color: AppColors.textPrimary,
                   height: 1.35,
                 ),
@@ -845,7 +845,7 @@ class _ProductRow extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: GoogleFonts.cairo(
                     fontSize: 12,
-                    fontWeight: FontWeight.w700,
+                    fontWeight: FontWeight.w600,
                     color: AppColors.textHint,
                   ),
                 ),
@@ -862,7 +862,7 @@ class _ProductRow extends StatelessWidget {
             textAlign: TextAlign.center,
             style: GoogleFonts.cairo(
               fontSize: 13,
-              fontWeight: FontWeight.w800,
+              fontWeight: FontWeight.w600,
               color: AppColors.textSecondary,
             ),
           ),
@@ -877,7 +877,7 @@ class _ProductRow extends StatelessWidget {
               currency: currency,
               style: GoogleFonts.cairo(
                 fontSize: 13,
-                fontWeight: FontWeight.w900,
+                fontWeight: FontWeight.w600,
                 color: AppColors.textPrimary,
               ),
             ),
@@ -898,11 +898,11 @@ class _ProductImage extends StatelessWidget {
     final imageUrl = item.imageUrl?.trim();
 
     return ClipRRect(
-      borderRadius: BorderRadius.circular(14),
+      borderRadius: BorderRadius.circular(16),
       child: Container(
         width: 58,
         height: 58,
-        color: const Color(0xFFF7ECEE),
+        color: AppColors.surfaceVariant,
         child: imageUrl != null && imageUrl.isNotEmpty
             ? Image.network(
                 imageUrl,
@@ -970,7 +970,7 @@ class _PaymentSummaryCard extends StatelessWidget {
           ],
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 13),
-            child: Divider(height: 1, color: const Color(0xFFEFE3E6)),
+            child: Divider(height: 1, color: AppColors.divider),
           ),
           _SummaryRow(
             label: 'الإجمالي',
@@ -1041,8 +1041,8 @@ class _SoftSection extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.fromLTRB(16, 15, 16, 16),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(22),
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(color: AppColors.divider.withValues(alpha: 0.85)),
         boxShadow: const [
           BoxShadow(
@@ -1061,8 +1061,8 @@ class _SoftSection extends StatelessWidget {
                 width: 38,
                 height: 38,
                 decoration: BoxDecoration(
-                  color: AppColors.blush,
-                  borderRadius: BorderRadius.circular(13),
+                  color: AppColors.secondary,
+                  borderRadius: BorderRadius.circular(16),
                 ),
                 child: Icon(icon, size: 18, color: AppColors.primary),
               ),
@@ -1073,7 +1073,7 @@ class _SoftSection extends StatelessWidget {
                   textAlign: TextAlign.start,
                   style: GoogleFonts.cairo(
                     fontSize: 14,
-                    fontWeight: FontWeight.w800,
+                    fontWeight: FontWeight.w600,
                     color: AppColors.textPrimary,
                   ),
                 ),
@@ -1097,7 +1097,7 @@ class _DetailLine extends StatelessWidget {
 
   const _DetailLine({
     required this.text,
-    this.weight = FontWeight.w700,
+    this.weight = FontWeight.w600,
     this.color = AppColors.textSecondary,
   });
 
@@ -1145,7 +1145,7 @@ class _SummaryRow extends StatelessWidget {
             textAlign: TextAlign.right,
             style: GoogleFonts.cairo(
               fontSize: isTotal ? 15 : 13,
-              fontWeight: isTotal ? FontWeight.w900 : FontWeight.w700,
+              fontWeight: isTotal ? FontWeight.w600 : FontWeight.w600,
               color: isTotal ? AppColors.textPrimary : AppColors.textSecondary,
             ),
           ),
@@ -1160,7 +1160,7 @@ class _SummaryRow extends StatelessWidget {
                     currency: currency ?? 'LYD',
                     style: GoogleFonts.cairo(
                       fontSize: isTotal ? 17 : 13,
-                      fontWeight: isTotal ? FontWeight.w900 : FontWeight.w800,
+                      fontWeight: isTotal ? FontWeight.w600 : FontWeight.w600,
                       color: valueColor ?? AppColors.textPrimary,
                     ),
                   )
@@ -1171,7 +1171,7 @@ class _SummaryRow extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                     style: GoogleFonts.cairo(
                       fontSize: isTotal ? 17 : 13,
-                      fontWeight: isTotal ? FontWeight.w900 : FontWeight.w800,
+                      fontWeight: isTotal ? FontWeight.w600 : FontWeight.w600,
                       color: valueColor ?? AppColors.textPrimary,
                     ),
                   ),
@@ -1207,7 +1207,7 @@ class _ErrorState extends StatelessWidget {
               textAlign: TextAlign.center,
               style: GoogleFonts.cairo(
                 fontSize: 15,
-                fontWeight: FontWeight.w700,
+                fontWeight: FontWeight.w600,
                 color: AppColors.textSecondary,
               ),
             ),
@@ -1217,18 +1217,18 @@ class _ErrorState extends StatelessWidget {
               style: ElevatedButton.styleFrom(
                 elevation: 0,
                 backgroundColor: AppColors.primary,
-                foregroundColor: Colors.white,
+                foregroundColor: AppColors.surface,
                 padding: const EdgeInsets.symmetric(
                   horizontal: 22,
                   vertical: 12,
                 ),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(14),
+                  borderRadius: BorderRadius.circular(16),
                 ),
               ),
               child: Text(
                 'إعادة المحاولة',
-                style: GoogleFonts.cairo(fontWeight: FontWeight.w800),
+                style: GoogleFonts.cairo(fontWeight: FontWeight.w600),
               ),
             ),
           ],

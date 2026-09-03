@@ -4,7 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../../core/theme/app_colors.dart';
 
-/// AILA Beauty Boutique — onboarding carousel.
+/// LUNORA Beauty Boutique — onboarding carousel.
 ///
 /// Mirrors the Lovable onboarding design: a tall image stage (58vh) with a
 /// softly rounded base that fades into pearl, a quiet "Skip" pill, then an
@@ -38,7 +38,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     ),
     _OnboardingSlide(
       image: 'assets/images/onboarding/onboarding_2.jpg',
-      eyebrow: 'دار AILA',
+      eyebrow: 'دار LUNORA',
       title: 'فخامة ناعمة تصلكِ.',
       body:
           'من السيرومات المخمليّة إلى أحمر الشفاه الساتان — كل تفصيلة محسوبة، وكل منتج محبوب.',
@@ -84,7 +84,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
-        backgroundColor: AppColors.pearl,
+        backgroundColor: AppColors.background,
         body: AnnotatedRegion<SystemUiOverlayStyle>(
           value: SystemUiOverlayStyle.dark,
           child: Column(
@@ -98,7 +98,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     Positioned.fill(
                       child: ClipRRect(
                         borderRadius: const BorderRadius.vertical(
-                          bottom: Radius.circular(40),
+                          bottom: Radius.circular(28),
                         ),
                         child: PageView.builder(
                           controller: _pageController,
@@ -123,7 +123,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                             gradient: LinearGradient(
                               begin: Alignment.topCenter,
                               end: Alignment.bottomCenter,
-                              colors: [Color(0x00FFF8F7), AppColors.pearl],
+                              colors: [Color(0x00F8F5F0), AppColors.background],
                             ),
                           ),
                         ),
@@ -136,7 +136,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       child: Align(
                         alignment: AlignmentDirectional.topEnd,
                         child: Padding(
-                          padding: const EdgeInsets.fromLTRB(20, 8, 20, 0),
+                          padding: const EdgeInsets.fromLTRB(24, 8, 24, 0),
                           child: _SkipPill(onTap: widget.onSkip),
                         ),
                       ),
@@ -148,7 +148,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               // ── Content ──
               Expanded(
                 child: Padding(
-                  padding: const EdgeInsets.fromLTRB(28, 24, 28, 40),
+                  padding: const EdgeInsets.fromLTRB(24, 24, 24, 40),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -214,14 +214,14 @@ class _SlideImage extends StatelessWidget {
         fit: BoxFit.cover,
         width: double.infinity,
         height: double.infinity,
-        errorBuilder: (context, error, stackTrace) => const Center(
+        errorBuilder: (context, error, stackTrace) => Center(
           child: Text(
-            'AILA',
-            style: TextStyle(
+            'LUNORA',
+            style: GoogleFonts.cairo(
               fontSize: 48,
               fontWeight: FontWeight.w600,
               letterSpacing: 8,
-              color: AppColors.roseGold,
+              color: AppColors.accent,
             ),
           ),
         ),
@@ -246,9 +246,9 @@ class _SlideText extends StatelessWidget {
           slide.eyebrow,
           style: GoogleFonts.cairo(
             fontSize: 11,
-            fontWeight: FontWeight.w700,
+            fontWeight: FontWeight.w600,
             letterSpacing: 1.5,
-            color: AppColors.roseGold,
+            color: AppColors.accent,
           ),
         ),
         const SizedBox(height: 14),
@@ -256,8 +256,8 @@ class _SlideText extends StatelessWidget {
           slide.title,
           style: GoogleFonts.cairo(
             fontSize: 30,
-            fontWeight: FontWeight.w800,
-            color: AppColors.mauve,
+            fontWeight: FontWeight.w600,
+            color: AppColors.textPrimary,
             height: 1.25,
           ),
         ),
@@ -267,7 +267,7 @@ class _SlideText extends StatelessWidget {
           style: GoogleFonts.cairo(
             fontSize: 14.5,
             fontWeight: FontWeight.w500,
-            color: AppColors.taupe,
+            color: AppColors.textSecondary,
             height: 1.7,
           ),
         ),
@@ -296,8 +296,8 @@ class _PageDots extends StatelessWidget {
           width: isActive ? 24 : 6,
           height: 6,
           decoration: BoxDecoration(
-            gradient: isActive ? AppColors.roseGradient : null,
-            color: isActive ? null : AppColors.blush,
+            gradient: isActive ? AppColors.primaryGradient : null,
+            color: isActive ? null : AppColors.secondary,
             borderRadius: BorderRadius.circular(6),
           ),
         );
@@ -319,13 +319,13 @@ class _RoseButton extends StatelessWidget {
       width: double.infinity,
       height: 54,
       decoration: BoxDecoration(
-        gradient: AppColors.roseGradient,
-        borderRadius: BorderRadius.circular(40),
-        boxShadow: [
+        gradient: AppColors.primaryGradient,
+        borderRadius: BorderRadius.circular(999),
+        boxShadow: const [
           BoxShadow(
-            color: AppColors.roseGold.withValues(alpha: 0.28),
-            blurRadius: 24,
-            offset: const Offset(0, 12),
+            color: AppColors.shadowSoft,
+            blurRadius: 20,
+            offset: Offset(0, 8),
           ),
         ],
       ),
@@ -333,14 +333,14 @@ class _RoseButton extends StatelessWidget {
         color: Colors.transparent,
         child: InkWell(
           onTap: onTap,
-          borderRadius: BorderRadius.circular(40),
+          borderRadius: BorderRadius.circular(999),
           child: Center(
             child: Text(
               label,
               style: GoogleFonts.cairo(
                 fontSize: 15.5,
-                fontWeight: FontWeight.w700,
-                color: AppColors.pearl,
+                fontWeight: FontWeight.w600,
+                color: AppColors.background,
                 letterSpacing: 0.3,
               ),
             ),
@@ -360,20 +360,20 @@ class _SkipPill extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: Colors.white.withValues(alpha: 0.85),
-      borderRadius: BorderRadius.circular(30),
+      color: AppColors.surface.withValues(alpha: 0.85),
+      borderRadius: BorderRadius.circular(28),
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(30),
+        borderRadius: BorderRadius.circular(28),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           child: Text(
             'تخطّي',
             style: GoogleFonts.cairo(
               fontSize: 12,
-              fontWeight: FontWeight.w700,
+              fontWeight: FontWeight.w600,
               letterSpacing: 1,
-              color: AppColors.taupe,
+              color: AppColors.textSecondary,
             ),
           ),
         ),

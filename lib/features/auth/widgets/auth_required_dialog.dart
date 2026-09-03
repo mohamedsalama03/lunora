@@ -22,7 +22,7 @@ Future<AuthPromptAction?> showAuthRequiredDialog(
     context: context,
     barrierLabel: 'auth_required_dialog',
     barrierDismissible: barrierDismissible,
-    barrierColor: AppColors.mauve.withValues(alpha: 0.34),
+    barrierColor: AppColors.textPrimary.withValues(alpha: 0.34),
     transitionDuration: const Duration(milliseconds: 260),
     pageBuilder: (dialogContext, animation, secondaryAnimation) =>
         const SizedBox.shrink(),
@@ -48,27 +48,29 @@ Future<AuthPromptAction?> showAuthRequiredDialog(
               ).animate(curvedAnimation),
               child: Center(
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 28),
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
                   child: Material(
                     color: Colors.transparent,
                     child: ConstrainedBox(
                       constraints: const BoxConstraints(maxWidth: 400),
                       child: Container(
-                        padding: const EdgeInsets.fromLTRB(26, 30, 26, 22),
+                        padding: const EdgeInsets.fromLTRB(24, 30, 24, 24),
                         decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(30),
+                          color: AppColors.surface,
+                          borderRadius: BorderRadius.circular(28),
                           border: Border.all(
-                            color: AppColors.rosePink.withValues(alpha: 0.18),
+                            color: AppColors.neutral.withValues(alpha: 0.18),
                           ),
                           boxShadow: <BoxShadow>[
                             BoxShadow(
-                              color: AppColors.mauve.withValues(alpha: 0.16),
+                              color: AppColors.textPrimary.withValues(
+                                alpha: 0.16,
+                              ),
                               blurRadius: 40,
                               offset: const Offset(0, 20),
                             ),
                             BoxShadow(
-                              color: AppColors.roseGold.withValues(alpha: 0.12),
+                              color: AppColors.accent.withValues(alpha: 0.12),
                               blurRadius: 24,
                               offset: const Offset(0, 8),
                             ),
@@ -88,18 +90,18 @@ Future<AuthPromptAction?> showAuthRequiredDialog(
                                   begin: Alignment.topRight,
                                   end: Alignment.bottomLeft,
                                   colors: <Color>[
-                                    AppColors.blush.withValues(alpha: 0.85),
-                                    Colors.white,
+                                    AppColors.secondary.withValues(alpha: 0.85),
+                                    AppColors.surface,
                                   ],
                                 ),
                                 border: Border.all(
-                                  color: AppColors.rosePink.withValues(
+                                  color: AppColors.neutral.withValues(
                                     alpha: 0.30,
                                   ),
                                 ),
                                 boxShadow: <BoxShadow>[
                                   BoxShadow(
-                                    color: AppColors.roseGold.withValues(
+                                    color: AppColors.accent.withValues(
                                       alpha: 0.18,
                                     ),
                                     blurRadius: 24,
@@ -110,7 +112,7 @@ Future<AuthPromptAction?> showAuthRequiredDialog(
                               child: Icon(
                                 icon,
                                 size: 36,
-                                color: AppColors.roseGold,
+                                color: AppColors.accent,
                               ),
                             ),
                             const SizedBox(height: 20),
@@ -119,8 +121,8 @@ Future<AuthPromptAction?> showAuthRequiredDialog(
                               textAlign: TextAlign.center,
                               style: GoogleFonts.cairo(
                                 fontSize: 11.5,
-                                fontWeight: FontWeight.w700,
-                                color: AppColors.roseGold,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.accent,
                                 letterSpacing: 0.2,
                                 height: 1,
                               ),
@@ -131,8 +133,8 @@ Future<AuthPromptAction?> showAuthRequiredDialog(
                               textAlign: TextAlign.center,
                               style: GoogleFonts.cairo(
                                 fontSize: 20,
-                                fontWeight: FontWeight.w800,
-                                color: AppColors.mauve,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.textPrimary,
                                 height: 1.35,
                               ),
                             ),
@@ -188,18 +190,18 @@ class _DialogPrimaryButton extends StatelessWidget {
       color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(16),
         child: Ink(
           width: double.infinity,
           height: 54,
           decoration: BoxDecoration(
             gradient: AppColors.primaryGradient,
-            borderRadius: BorderRadius.circular(18),
-            boxShadow: <BoxShadow>[
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: const <BoxShadow>[
               BoxShadow(
-                color: AppColors.roseGold.withValues(alpha: 0.30),
+                color: AppColors.shadowSoft,
                 blurRadius: 18,
-                offset: const Offset(0, 10),
+                offset: Offset(0, 8),
               ),
             ],
           ),
@@ -208,8 +210,8 @@ class _DialogPrimaryButton extends StatelessWidget {
               label,
               style: GoogleFonts.cairo(
                 fontSize: 15.5,
-                fontWeight: FontWeight.w800,
-                color: Colors.white,
+                fontWeight: FontWeight.w600,
+                color: AppColors.surface,
               ),
             ),
           ),
@@ -240,7 +242,7 @@ class _DialogGhostButton extends StatelessWidget {
               label,
               style: GoogleFonts.cairo(
                 fontSize: 14,
-                fontWeight: FontWeight.w700,
+                fontWeight: FontWeight.w600,
                 color: AppColors.textSecondary,
               ),
             ),

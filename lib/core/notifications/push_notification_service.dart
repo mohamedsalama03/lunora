@@ -18,7 +18,7 @@ import '../../features/notifications/repositories/notifications_api_repository.d
 import '../../features/notifications/repositories/notifications_storage.dart';
 import '../../features/orders/screens/order_detail_screen.dart';
 import '../../features/profile/screens/orders_screen.dart' as profile_orders;
-import '../../features/profile/screens/wallet_screen.dart' as profile_wallet;
+import '../../features/wallet/screens/wallet_screen.dart' as wallet;
 import '../navigation/app_navigator.dart';
 import '../navigation/app_shell_controller.dart';
 import '../../features/notifications/screens/notifications_screen.dart';
@@ -331,7 +331,7 @@ class PushNotificationService with WidgetsBindingObserver {
 
   Future<void> sendTestNotification() async {
     await _notificationsApiRepository.sendTestNotification(
-      title: 'Hello from AILA',
+      title: 'Hello from LUNORA',
       body: 'This is a test notification.',
       data: const {'type': 'test_notification', 'screen': 'notifications'},
     );
@@ -736,9 +736,7 @@ class PushNotificationService with WidgetsBindingObserver {
 
       case 'wallet':
         await navigatorState.push(
-          MaterialPageRoute<void>(
-            builder: (_) => const profile_wallet.WalletScreen(),
-          ),
+          MaterialPageRoute<void>(builder: (_) => const wallet.WalletScreen()),
         );
         return;
 

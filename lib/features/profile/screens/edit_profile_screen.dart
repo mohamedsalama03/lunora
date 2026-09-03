@@ -141,9 +141,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               child: SingleChildScrollView(
                 physics: const BouncingScrollPhysics(),
                 padding: EdgeInsets.fromLTRB(
-                  20,
+                  24,
                   22,
-                  20,
+                  24,
                   MediaQuery.viewInsetsOf(context).bottom + 28,
                 ),
                 child: Form(
@@ -292,96 +292,79 @@ class _EditHeader extends StatelessWidget {
 
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.fromLTRB(20, topPad + 14, 20, 26),
-      decoration: const BoxDecoration(
-        gradient: AppColors.roseGradient,
-        borderRadius: BorderRadius.only(
-          bottomLeft: Radius.circular(36),
-          bottomRight: Radius.circular(36),
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.shadowSoft,
-            blurRadius: 28,
-            offset: Offset(0, 14),
-          ),
-        ],
-      ),
+      padding: EdgeInsets.fromLTRB(24, topPad + 24, 24, 12),
       child: Consumer<AuthProvider>(
         builder: (context, auth, _) {
           final name = auth.user?.name.trim();
-          final email = auth.user?.email.trim();
           final initial = (name != null && name.isNotEmpty)
               ? name.characters.first.toUpperCase()
               : 'A';
 
-          return Column(
+          return Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Row(
-                children: [
-                  _CircleButton(
-                    icon: AppIcons.arrow_back_ios_new_rounded,
-                    onTap: onBack,
-                  ),
-                  Expanded(
-                    child: Text(
-                      'تعديل الحساب',
-                      textAlign: TextAlign.center,
+              _CircleButton(
+                icon: AppIcons.arrow_back_ios_new_rounded,
+                onTap: onBack,
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'ACCOUNT',
                       style: GoogleFonts.cairo(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w800,
-                        color: Colors.white,
+                        fontSize: 10,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 2.4,
+                        color: AppColors.textSecondary,
                       ),
                     ),
-                  ),
-                  const SizedBox(width: 42),
-                ],
+                    const SizedBox(height: 3),
+                    Text(
+                      'تعديل الحساب',
+                      style: GoogleFonts.cairo(
+                        fontSize: 21,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.textPrimary,
+                        height: 1.2,
+                      ),
+                    ),
+                    if (name != null && name.isNotEmpty) ...[
+                      const SizedBox(height: 2),
+                      Text(
+                        name,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: GoogleFonts.cairo(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                          color: AppColors.textSecondary,
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
               ),
-              const SizedBox(height: 18),
+              const SizedBox(width: 12),
               Container(
-                width: 90,
-                height: 90,
+                width: 40,
+                height: 40,
                 alignment: Alignment.center,
                 decoration: const BoxDecoration(
                   shape: BoxShape.circle,
-                  color: Colors.white,
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppColors.shadowFloat,
-                      blurRadius: 20,
-                      offset: Offset(0, 8),
-                    ),
-                  ],
+                  color: AppColors.secondary,
                 ),
                 child: Text(
                   initial,
                   style: GoogleFonts.cairo(
-                    fontSize: 36,
+                    fontSize: 15,
                     fontWeight: FontWeight.w600,
-                    color: AppColors.roseGold,
+                    color: AppColors.primary,
                   ),
                 ),
               ),
-              const SizedBox(height: 12),
-              Text(
-                (name != null && name.isNotEmpty) ? name : 'حسابي',
-                style: GoogleFonts.cairo(
-                  fontSize: 19,
-                  fontWeight: FontWeight.w800,
-                  color: Colors.white,
-                ),
-              ),
-              if (email != null && email.isNotEmpty) ...[
-                const SizedBox(height: 3),
-                Text(
-                  email,
-                  style: GoogleFonts.cairo(
-                    fontSize: 12.5,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.white.withValues(alpha: 0.85),
-                  ),
-                ),
-              ],
             ],
           );
         },
@@ -399,16 +382,16 @@ class _CircleButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: Colors.white,
-      shape: const CircleBorder(),
+      color: AppColors.surface,
+      shape: CircleBorder(side: BorderSide(color: AppColors.divider)),
       child: InkWell(
         onTap: onTap,
         customBorder: const CircleBorder(),
         child: Container(
-          width: 42,
-          height: 42,
+          width: 40,
+          height: 40,
           alignment: Alignment.center,
-          child: Icon(icon, size: 20, color: AppColors.roseGold),
+          child: Icon(icon, size: 19, color: AppColors.textPrimary),
         ),
       ),
     );
@@ -437,7 +420,7 @@ class _FormSection extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(18, 18, 18, 18),
       decoration: BoxDecoration(
         color: AppColors.surface,
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(16),
         boxShadow: const [
           BoxShadow(
             color: AppColors.shadowCard,
@@ -455,11 +438,11 @@ class _FormSection extends StatelessWidget {
                 width: 38,
                 height: 38,
                 decoration: const BoxDecoration(
-                  color: AppColors.blush,
+                  color: AppColors.secondary,
                   shape: BoxShape.circle,
                 ),
                 alignment: Alignment.center,
-                child: Icon(icon, size: 19, color: AppColors.roseGold),
+                child: Icon(icon, size: 19, color: AppColors.accent),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -470,8 +453,8 @@ class _FormSection extends StatelessWidget {
                       title,
                       style: GoogleFonts.cairo(
                         fontSize: 15.5,
-                        fontWeight: FontWeight.w800,
-                        color: AppColors.mauve,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.textPrimary,
                       ),
                     ),
                     if (hint != null) ...[
@@ -481,7 +464,7 @@ class _FormSection extends StatelessWidget {
                         style: GoogleFonts.cairo(
                           fontSize: 11.5,
                           fontWeight: FontWeight.w500,
-                          color: AppColors.taupe,
+                          color: AppColors.textSecondary,
                         ),
                       ),
                     ],
@@ -530,7 +513,7 @@ class _BuildTextField extends StatelessWidget {
 
     OutlineInputBorder borderWith(Color color, double width) {
       return OutlineInputBorder(
-        borderRadius: BorderRadius.circular(15),
+        borderRadius: BorderRadius.circular(16),
         borderSide: color == Colors.transparent
             ? BorderSide.none
             : BorderSide(color: color, width: width),
@@ -543,30 +526,30 @@ class _BuildTextField extends StatelessWidget {
       keyboardType: keyboardType,
       validator: validator,
       style: GoogleFonts.cairo(
-        fontWeight: FontWeight.w700,
+        fontWeight: FontWeight.w600,
         fontSize: 14.5,
         color: AppColors.textPrimary,
       ),
       decoration: InputDecoration(
         labelText: label,
         floatingLabelStyle: GoogleFonts.cairo(
-          color: AppColors.roseGold,
+          color: AppColors.accent,
           fontSize: 13.5,
-          fontWeight: FontWeight.w700,
+          fontWeight: FontWeight.w600,
         ),
         labelStyle: GoogleFonts.cairo(
-          color: AppColors.taupe,
+          color: AppColors.textSecondary,
           fontSize: 14,
           fontWeight: FontWeight.w600,
         ),
-        prefixIcon: Icon(icon, color: AppColors.roseGold, size: 21),
+        prefixIcon: Icon(icon, color: AppColors.accent, size: 21),
         suffixIcon: isPassword
             ? IconButton(
                 icon: Icon(
                   isObscure
                       ? AppIcons.visibility_off_outlined
                       : AppIcons.visibility_outlined,
-                  color: AppColors.taupe,
+                  color: AppColors.textSecondary,
                   size: 20,
                 ),
                 onPressed: onToggleVisibility,

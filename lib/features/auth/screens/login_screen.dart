@@ -132,8 +132,8 @@ class _LoginScreenState extends State<LoginScreen> {
                   'أهلاً بعودتكِ',
                   style: GoogleFonts.cairo(
                     fontSize: 28,
-                    fontWeight: FontWeight.w900,
-                    color: AppColors.mauve,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textPrimary,
                     height: 1.2,
                   ),
                 ),
@@ -143,7 +143,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   style: GoogleFonts.cairo(
                     fontSize: 14.5,
                     fontWeight: FontWeight.w500,
-                    color: AppColors.taupe,
+                    color: AppColors.textSecondary,
                   ),
                 ),
                 const SizedBox(height: 22),
@@ -181,8 +181,8 @@ class _LoginScreenState extends State<LoginScreen> {
                       'نسيتِ كلمة المرور؟',
                       style: GoogleFonts.cairo(
                         fontSize: 13,
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.roseGold,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.accent,
                       ),
                     ),
                   ),

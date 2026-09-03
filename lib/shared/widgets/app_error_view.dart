@@ -7,7 +7,7 @@ import '../../core/theme/app_colors.dart';
 /// نوع المشكلة المستنتَج من رسالة الخطأ.
 enum AppErrorKind { connection, server, generic }
 
-/// حالة خطأ أنيقة بأسلوب AILA تُعرض عند ضعف الإنترنت أو وجود مشكلة في الخادم.
+/// حالة خطأ أنيقة بأسلوب LUNORA تُعرض عند ضعف الإنترنت أو وجود مشكلة في الخادم.
 ///
 /// تصنّف الخطأ تلقائياً (اتصال / خادم / عام) وتعرض أيقونة ورسالة مناسبة
 /// مع زر "إعادة المحاولة". استخدمي [compact] للأقسام الداخلية الصغيرة.
@@ -76,7 +76,7 @@ class AppErrorView extends StatelessWidget {
 
     return Center(
       child: Padding(
-        padding: EdgeInsets.all(compact ? 22 : 30),
+        padding: EdgeInsets.all(compact ? 16 : 24),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -90,22 +90,22 @@ class AppErrorView extends StatelessWidget {
                   begin: Alignment.topRight,
                   end: Alignment.bottomLeft,
                   colors: [
-                    AppColors.blush.withValues(alpha: 0.8),
-                    Colors.white,
+                    AppColors.secondary.withValues(alpha: 0.8),
+                    AppColors.surface,
                   ],
                 ),
                 border: Border.all(
-                  color: AppColors.rosePink.withValues(alpha: 0.28),
+                  color: AppColors.neutral.withValues(alpha: 0.28),
                 ),
                 boxShadow: [
-                  BoxShadow(
-                    color: AppColors.roseGold.withValues(alpha: 0.10),
-                    blurRadius: 26,
-                    offset: const Offset(0, 14),
+                  const BoxShadow(
+                    color: AppColors.shadowCard,
+                    blurRadius: 24,
+                    offset: Offset(0, 10),
                   ),
                 ],
               ),
-              child: Icon(icon, size: iconSize, color: AppColors.roseGold),
+              child: Icon(icon, size: iconSize, color: AppColors.accent),
             ),
             SizedBox(height: compact ? 18 : 24),
             Text(
@@ -113,8 +113,8 @@ class AppErrorView extends StatelessWidget {
               textAlign: TextAlign.center,
               style: GoogleFonts.cairo(
                 fontSize: compact ? 16 : 20,
-                fontWeight: FontWeight.w800,
-                color: AppColors.mauve,
+                fontWeight: FontWeight.w600,
+                color: AppColors.textPrimary,
                 height: 1.2,
               ),
             ),
@@ -164,11 +164,11 @@ class _RetryButton extends StatelessWidget {
           decoration: BoxDecoration(
             gradient: AppColors.primaryGradient,
             borderRadius: BorderRadius.circular(999),
-            boxShadow: [
+            boxShadow: const [
               BoxShadow(
-                color: AppColors.roseGold.withValues(alpha: 0.30),
+                color: AppColors.shadowSoft,
                 blurRadius: 18,
-                offset: const Offset(0, 10),
+                offset: Offset(0, 8),
               ),
             ],
           ),
@@ -186,13 +186,13 @@ class _RetryButton extends StatelessWidget {
                     height: 18,
                     child: CircularProgressIndicator(
                       strokeWidth: 2,
-                      color: Colors.white,
+                      color: AppColors.surface,
                     ),
                   )
                 else
                   Icon(
                     AppIcons.refresh_rounded,
-                    color: Colors.white,
+                    color: AppColors.surface,
                     size: compact ? 17 : 19,
                   ),
                 const SizedBox(width: 9),
@@ -200,8 +200,8 @@ class _RetryButton extends StatelessWidget {
                   'إعادة المحاولة',
                   style: GoogleFonts.cairo(
                     fontSize: compact ? 13 : 14,
-                    fontWeight: FontWeight.w800,
-                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.surface,
                   ),
                 ),
               ],

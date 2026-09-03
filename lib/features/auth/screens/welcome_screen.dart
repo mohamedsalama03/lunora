@@ -6,8 +6,8 @@ import '../../../core/theme/app_theme.dart';
 import 'login_screen.dart';
 import 'register_screen.dart';
 
-/// AILA Beauty Boutique — onboarding / auth gateway.
-/// Soft luxury aesthetic: blush gradient, Playfair "AILA" wordmark, rose-gold ritual.
+/// LUNORA Beauty Boutique — onboarding / auth gateway.
+/// Soft luxury aesthetic: blush gradient, Cairo "LUNORA" wordmark, rose-gold ritual.
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({super.key});
 
@@ -27,7 +27,7 @@ class WelcomeScreen extends StatelessWidget {
                 top: -40,
                 child: _Bloom(
                   size: 220,
-                  color: AppColors.rosePink.withValues(alpha: 0.18),
+                  color: AppColors.neutral.withValues(alpha: 0.18),
                 ),
               ),
               Positioned(
@@ -35,12 +35,12 @@ class WelcomeScreen extends StatelessWidget {
                 bottom: 120,
                 child: _Bloom(
                   size: 160,
-                  color: AppColors.roseGold.withValues(alpha: 0.10),
+                  color: AppColors.accent.withValues(alpha: 0.10),
                 ),
               ),
               SafeArea(
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 28),
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
                   child: Column(
                     children: [
                       const SizedBox(height: 28),
@@ -50,53 +50,55 @@ class WelcomeScreen extends StatelessWidget {
                         style: GoogleFonts.cairo(
                           fontSize: 11,
                           fontWeight: FontWeight.w500,
-                          color: AppColors.roseGold,
+                          color: AppColors.accent,
                           letterSpacing: 5,
                         ),
                       ),
 
                       const Spacer(flex: 3),
 
-                      // AILA wordmark
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'AILA',
-                            style: AppTheme.brandFont(
-                              fontSize: 56,
-                              fontWeight: FontWeight.w600,
-                              color: AppColors.mauve,
-                              letterSpacing: 8,
-                            ),
-                          ),
-                          const SizedBox(width: 6),
-                          Padding(
-                            padding: const EdgeInsets.only(top: 16),
-                            child: Container(
-                              width: 7,
-                              height: 7,
-                              decoration: const BoxDecoration(
-                                shape: BoxShape.circle,
-                                gradient: AppColors.roseGradient,
+                      // LUNORA wordmark
+                      FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'LUNORA',
+                              style: AppTheme.brandFont(
+                                fontSize: 56,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.textPrimary,
+                                letterSpacing: 8,
                               ),
                             ),
-                          ),
-                        ],
+                            const SizedBox(width: 6),
+                            Padding(
+                              padding: const EdgeInsets.only(top: 16),
+                              child: Container(
+                                width: 7,
+                                height: 7,
+                                decoration: const BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  gradient: AppColors.primaryGradient,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                       const SizedBox(height: 10),
                       Text(
                         'la beauté en délicatesse',
                         style: GoogleFonts.cairo(
                           fontSize: 16,
-                          fontStyle: FontStyle.italic,
-                          color: AppColors.taupe,
+                          color: AppColors.textSecondary,
                         ),
                       ),
                       const SizedBox(height: 18),
                       Text(
-                        'مرحباً بكِ في عالم آيلا للجمال',
+                        'مرحباً بكِ في عالم لونورا للجمال',
                         textAlign: TextAlign.center,
                         style: GoogleFonts.cairo(
                           fontSize: 15,
@@ -168,13 +170,13 @@ class _PrimaryButton extends StatelessWidget {
       width: double.infinity,
       height: 58,
       decoration: BoxDecoration(
-        gradient: AppColors.roseGradient,
-        borderRadius: BorderRadius.circular(40),
-        boxShadow: [
+        gradient: AppColors.primaryGradient,
+        borderRadius: BorderRadius.circular(999),
+        boxShadow: const [
           BoxShadow(
-            color: AppColors.roseGold.withValues(alpha: 0.32),
-            blurRadius: 22,
-            offset: const Offset(0, 10),
+            color: AppColors.shadowSoft,
+            blurRadius: 20,
+            offset: Offset(0, 8),
           ),
         ],
       ),
@@ -182,14 +184,14 @@ class _PrimaryButton extends StatelessWidget {
         color: Colors.transparent,
         child: InkWell(
           onTap: onTap,
-          borderRadius: BorderRadius.circular(40),
+          borderRadius: BorderRadius.circular(999),
           child: Center(
             child: Text(
               label,
               style: GoogleFonts.cairo(
                 fontSize: 16,
-                fontWeight: FontWeight.w700,
-                color: AppColors.pearl,
+                fontWeight: FontWeight.w600,
+                color: AppColors.background,
               ),
             ),
           ),
@@ -211,9 +213,9 @@ class _OutlinedButton extends StatelessWidget {
       height: 58,
       decoration: BoxDecoration(
         color: AppColors.surface.withValues(alpha: 0.6),
-        borderRadius: BorderRadius.circular(40),
+        borderRadius: BorderRadius.circular(999),
         border: Border.all(
-          color: AppColors.roseGold.withValues(alpha: 0.35),
+          color: AppColors.accent.withValues(alpha: 0.35),
           width: 1.4,
         ),
       ),
@@ -221,14 +223,14 @@ class _OutlinedButton extends StatelessWidget {
         color: Colors.transparent,
         child: InkWell(
           onTap: onTap,
-          borderRadius: BorderRadius.circular(40),
+          borderRadius: BorderRadius.circular(999),
           child: Center(
             child: Text(
               label,
               style: GoogleFonts.cairo(
                 fontSize: 16,
-                fontWeight: FontWeight.w700,
-                color: AppColors.roseGold,
+                fontWeight: FontWeight.w600,
+                color: AppColors.accent,
               ),
             ),
           ),

@@ -5,10 +5,10 @@
 // 'flutter create' template.
 
 // The application's name. By default this is also the title of the Flutter window.
-PRODUCT_NAME = AILA
+PRODUCT_NAME = LUNORA
 
 // The application's bundle identifier
 PRODUCT_BUNDLE_IDENTIFIER = com.aila.beauty
 
 // The copyright displayed in application information
-PRODUCT_COPYRIGHT = Copyright © 2026 AILA. All rights reserved.
+PRODUCT_COPYRIGHT = Copyright © 2026 LUNORA. All rights reserved.

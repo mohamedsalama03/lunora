@@ -117,6 +117,20 @@ void main() {
       expect(product.tags, <String>['skin', '3']);
     });
 
+    test('maps the legacy store brand to LUNORA for display', () {
+      final product = ProductModel.fromJson(
+        _baseJson()
+          ..['brand'] = <String, dynamic>{
+            'id': 7,
+            'name': 'AILA',
+            'slug': 'aila',
+          },
+      );
+
+      expect(product.brand?.name, 'LUNORA');
+      expect(product.brand?.slug, 'aila');
+    });
+
     test('maps detail content fields from product details payload', () {
       final json = _baseJson()
         ..['ingredients'] = <dynamic>[' water ', '', null, 'vitamin c']

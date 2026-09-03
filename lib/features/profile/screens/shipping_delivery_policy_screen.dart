@@ -11,7 +11,7 @@ class ShippingDeliveryPolicyScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFFF8F7),
+      backgroundColor: AppColors.background,
       body: SafeArea(
         child: Column(
           children: [
@@ -19,7 +19,7 @@ class ShippingDeliveryPolicyScreen extends StatelessWidget {
             Expanded(
               child: ListView(
                 physics: const BouncingScrollPhysics(),
-                padding: const EdgeInsets.fromLTRB(20, 10, 20, 28),
+                padding: const EdgeInsets.fromLTRB(24, 10, 24, 28),
                 children: const [
                   _PolicyHeroCard(),
                   SizedBox(height: 22),
@@ -125,7 +125,7 @@ class _PolicyTopBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 6),
+      padding: const EdgeInsets.fromLTRB(24, 8, 24, 6),
       child: Row(
         children: [
           _CircleActionButton(
@@ -137,7 +137,7 @@ class _PolicyTopBar extends StatelessWidget {
             'الشحن والتوصيل',
             style: GoogleFonts.cairo(
               fontSize: 18,
-              fontWeight: FontWeight.w800,
+              fontWeight: FontWeight.w600,
               color: AppColors.textPrimary,
             ),
           ),
@@ -156,14 +156,14 @@ class _PolicyHeroCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(22),
+      padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         color: AppColors.surface,
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: const Color(0xFFEFE3E6)),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.divider),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.035),
+            color: AppColors.textPrimary.withValues(alpha: 0.035),
             blurRadius: 18,
             offset: const Offset(0, 8),
           ),
@@ -177,7 +177,7 @@ class _PolicyHeroCard extends StatelessWidget {
             height: 54,
             decoration: BoxDecoration(
               color: AppColors.primaryUltraLight.withValues(alpha: 0.55),
-              borderRadius: BorderRadius.circular(18),
+              borderRadius: BorderRadius.circular(16),
             ),
             child: const Icon(
               AppIcons.local_shipping_rounded,
@@ -191,7 +191,7 @@ class _PolicyHeroCard extends StatelessWidget {
             'سياسة الشحن والتوصيل',
             style: GoogleFonts.cairo(
               fontSize: 22,
-              fontWeight: FontWeight.w900,
+              fontWeight: FontWeight.w600,
               color: AppColors.textPrimary,
               height: 1.25,
             ),
@@ -221,9 +221,9 @@ class _PolicyCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFFEFE3E6)),
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.divider),
       ),
       child: Column(children: children),
     );
@@ -253,7 +253,7 @@ class _PolicyPoint extends StatelessWidget {
             height: 42,
             decoration: BoxDecoration(
               color: AppColors.primaryUltraLight.withValues(alpha: 0.45),
-              borderRadius: BorderRadius.circular(14),
+              borderRadius: BorderRadius.circular(16),
             ),
             child: Icon(
               icon,
@@ -271,7 +271,7 @@ class _PolicyPoint extends StatelessWidget {
                   title,
                   style: GoogleFonts.cairo(
                     fontSize: 14,
-                    fontWeight: FontWeight.w800,
+                    fontWeight: FontWeight.w600,
                     color: AppColors.textPrimary,
                     height: 1.35,
                   ),
@@ -303,9 +303,9 @@ class _ChecklistCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFFEFE3E6)),
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.divider),
       ),
       child: const Column(
         children: [
@@ -375,7 +375,7 @@ class _SupportNoticeCard extends StatelessWidget {
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
         color: AppColors.primary,
-        borderRadius: BorderRadius.circular(22),
+        borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
             color: AppColors.primary.withValues(alpha: 0.18),
@@ -389,7 +389,7 @@ class _SupportNoticeCard extends StatelessWidget {
         children: [
           const Icon(
             AppIcons.headset_mic_rounded,
-            color: Colors.white,
+            color: AppColors.surface,
             size: 24,
             textDirection: TextDirection.ltr,
           ),
@@ -399,8 +399,8 @@ class _SupportNoticeCard extends StatelessWidget {
               'إذا كان عنوانك غير مدعوم أو ظهرت رسوم غير متوقعة، تواصل مع الدعم قبل تأكيد الطلب.',
               style: GoogleFonts.cairo(
                 fontSize: 13,
-                fontWeight: FontWeight.w700,
-                color: Colors.white,
+                fontWeight: FontWeight.w600,
+                color: AppColors.surface,
                 height: 1.6,
               ),
             ),
@@ -416,7 +416,7 @@ class _PolicyDivider extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Divider(height: 1, color: Color(0xFFEFE3E6));
+    return const Divider(height: 1, color: AppColors.divider);
   }
 }
 
@@ -431,7 +431,7 @@ class _SectionTitle extends StatelessWidget {
       title,
       style: GoogleFonts.cairo(
         fontSize: 16,
-        fontWeight: FontWeight.w900,
+        fontWeight: FontWeight.w600,
         color: AppColors.textPrimary,
       ),
     );
@@ -453,12 +453,12 @@ class _CircleActionButton extends StatelessWidget {
         width: 42,
         height: 42,
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.surface,
           shape: BoxShape.circle,
-          border: Border.all(color: const Color(0xFFEFE3E6)),
+          border: Border.all(color: AppColors.divider),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.035),
+              color: AppColors.textPrimary.withValues(alpha: 0.035),
               blurRadius: 14,
               offset: const Offset(0, 5),
             ),

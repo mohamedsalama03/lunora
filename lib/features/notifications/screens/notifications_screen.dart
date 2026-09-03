@@ -63,7 +63,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                 Expanded(
                   child: RefreshIndicator(
                     color: AppColors.primary,
-                    backgroundColor: Colors.white,
+                    backgroundColor: AppColors.surface,
                     onRefresh: notifications.reload,
                     child: _buildBody(notifications),
                   ),
@@ -95,7 +95,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         physics: const AlwaysScrollableScrollPhysics(
           parent: BouncingScrollPhysics(),
         ),
-        padding: const EdgeInsets.fromLTRB(20, 20, 20, 40),
+        padding: const EdgeInsets.fromLTRB(24, 20, 24, 40),
         children: [
           if (prompt != null) ...[prompt, const SizedBox(height: 8)],
           const SizedBox(height: 24),
@@ -108,7 +108,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       physics: const AlwaysScrollableScrollPhysics(
         parent: BouncingScrollPhysics(),
       ),
-      padding: const EdgeInsets.fromLTRB(20, 20, 20, 32),
+      padding: const EdgeInsets.fromLTRB(24, 20, 24, 32),
       itemCount: notifications.items.length + (prompt != null ? 1 : 0),
       itemBuilder: (context, index) {
         if (prompt != null && index == 0) {
@@ -125,7 +125,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
 }
 
 // ─────────────────────────────────────────────────────────────
-// Header — rose-gradient curved header (matches the rest of AILA)
+// Quiet Aura header.
 // ─────────────────────────────────────────────────────────────
 
 class _NotificationsHeader extends StatelessWidget {
@@ -145,101 +145,76 @@ class _NotificationsHeader extends StatelessWidget {
 
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.fromLTRB(20, topPad + 14, 20, 26),
-      decoration: const BoxDecoration(
-        gradient: AppColors.roseGradient,
-        borderRadius: BorderRadius.only(
-          bottomLeft: Radius.circular(36),
-          bottomRight: Radius.circular(36),
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.shadowSoft,
-            blurRadius: 28,
-            offset: Offset(0, 14),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      padding: EdgeInsets.fromLTRB(24, topPad + 24, 24, 12),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Row(
-            children: [
-              _CircleButton(
-                icon: AppIcons.arrow_back_ios_new_rounded,
-                onTap: onBack,
-              ),
-              const Spacer(),
-              if (onMarkAllRead != null)
-                _GlassChip(
-                  icon: AppIcons.check_rounded,
-                  label: 'تعليم الكل كمقروء',
-                  onTap: onMarkAllRead!,
-                ),
-            ],
+          _CircleButton(
+            icon: AppIcons.arrow_back_ios_new_rounded,
+            onTap: onBack,
           ),
-          const SizedBox(height: 18),
-          Text(
-            'NOTIFICATIONS',
-            style: GoogleFonts.cairo(
-              fontSize: 10.5,
-              fontWeight: FontWeight.w600,
-              letterSpacing: 3,
-              color: Colors.white.withValues(alpha: 0.85),
-            ),
-          ),
-          const SizedBox(height: 4),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Expanded(
-                child: Text(
-                  'الإشعارات',
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'NOTIFICATIONS',
                   style: GoogleFonts.cairo(
-                    fontSize: 26,
-                    fontWeight: FontWeight.w800,
-                    color: Colors.white,
-                    height: 1.1,
+                    fontSize: 10,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: 2.2,
+                    color: AppColors.textSecondary,
                   ),
                 ),
-              ),
-              if (unreadCount > 0) ...[
-                const SizedBox(width: 12),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 14,
-                    vertical: 7,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.18),
-                    borderRadius: BorderRadius.circular(40),
-                    border: Border.all(
-                      color: Colors.white.withValues(alpha: 0.28),
-                    ),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Icon(
-                        AppIcons.notifications_active_outlined,
-                        size: 14,
-                        color: Colors.white,
-                      ),
-                      const SizedBox(width: 5),
-                      Text(
-                        '$unreadCount جديد',
+                const SizedBox(height: 3),
+                Row(
+                  children: [
+                    Flexible(
+                      child: Text(
+                        'الإشعارات',
                         style: GoogleFonts.cairo(
-                          fontSize: 12.5,
-                          fontWeight: FontWeight.w800,
-                          color: Colors.white,
+                          fontSize: 21,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.textPrimary,
+                          height: 1.2,
+                        ),
+                      ),
+                    ),
+                    if (unreadCount > 0) ...[
+                      const SizedBox(width: 8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 9,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppColors.secondary,
+                          borderRadius: BorderRadius.circular(999),
+                        ),
+                        child: Text(
+                          '$unreadCount',
+                          style: GoogleFonts.cairo(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.primary,
+                          ),
                         ),
                       ),
                     ],
-                  ),
+                  ],
                 ),
               ],
-            ],
+            ),
           ),
+          if (onMarkAllRead != null) ...[
+            const SizedBox(width: 10),
+            _GlassChip(
+              icon: AppIcons.check_rounded,
+              label: 'تعليم الكل كمقروء',
+              onTap: onMarkAllRead!,
+            ),
+          ],
         ],
       ),
     );
@@ -255,16 +230,16 @@ class _CircleButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: Colors.white,
-      shape: const CircleBorder(),
+      color: AppColors.surface,
+      shape: CircleBorder(side: BorderSide(color: AppColors.divider)),
       child: InkWell(
         onTap: onTap,
         customBorder: const CircleBorder(),
         child: Container(
-          width: 42,
-          height: 42,
+          width: 40,
+          height: 40,
           alignment: Alignment.center,
-          child: Icon(icon, size: 20, color: AppColors.roseGold),
+          child: Icon(icon, size: 19, color: AppColors.textPrimary),
         ),
       ),
     );
@@ -285,28 +260,28 @@ class _GlassChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: Colors.white.withValues(alpha: 0.18),
-      borderRadius: BorderRadius.circular(40),
+      color: AppColors.surface,
+      borderRadius: BorderRadius.circular(999),
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(40),
+        borderRadius: BorderRadius.circular(999),
         child: Ink(
-          padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 8),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(40),
-            border: Border.all(color: Colors.white.withValues(alpha: 0.28)),
+            borderRadius: BorderRadius.circular(999),
+            border: Border.all(color: AppColors.divider),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(icon, size: 15, color: Colors.white),
+              Icon(icon, size: 15, color: AppColors.primary),
               const SizedBox(width: 6),
               Text(
                 label,
                 style: GoogleFonts.cairo(
                   fontSize: 12.5,
-                  fontWeight: FontWeight.w700,
-                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.textPrimary,
                   height: 1.1,
                 ),
               ),
@@ -334,18 +309,18 @@ class _NotificationTile extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 12),
       child: Material(
         color: Colors.transparent,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(16),
         child: InkWell(
           onTap: () {
             HapticFeedback.selectionClick();
             context.read<PushNotificationService>().openNotificationItem(item);
           },
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(16),
           child: Ink(
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
               color: item.unread ? AppColors.surfaceVariant : AppColors.surface,
-              borderRadius: BorderRadius.circular(20),
+              borderRadius: BorderRadius.circular(16),
               boxShadow: const [
                 BoxShadow(
                   color: AppColors.shadowCard,
@@ -362,7 +337,7 @@ class _NotificationTile extends StatelessWidget {
                   height: 46,
                   decoration: BoxDecoration(
                     color: visual.color.withValues(alpha: 0.12),
-                    borderRadius: BorderRadius.circular(15),
+                    borderRadius: BorderRadius.circular(16),
                   ),
                   alignment: Alignment.center,
                   child: Icon(visual.icon, color: visual.color, size: 22),
@@ -382,8 +357,8 @@ class _NotificationTile extends StatelessWidget {
                               style: GoogleFonts.cairo(
                                 fontSize: 14.5,
                                 fontWeight: item.unread
-                                    ? FontWeight.w800
-                                    : FontWeight.w700,
+                                    ? FontWeight.w600
+                                    : FontWeight.w600,
                                 color: AppColors.textPrimary,
                                 height: 1.25,
                               ),
@@ -473,12 +448,12 @@ class _NotificationTile extends StatelessWidget {
       case 'payment.failed':
         return const _NotificationVisuals(
           icon: AppIcons.warning_amber_rounded,
-          color: AppColors.badge,
+          color: AppColors.error,
         );
       default:
         return const _NotificationVisuals(
           icon: AppIcons.notifications_none_rounded,
-          color: AppColors.roseGold,
+          color: AppColors.accent,
         );
     }
   }
@@ -521,7 +496,7 @@ class _EmptyStateView extends StatelessWidget {
             child: const Icon(
               AppIcons.notifications_none_rounded,
               size: 52,
-              color: AppColors.roseGold,
+              color: AppColors.accent,
             ),
           ),
           const SizedBox(height: 26),
@@ -532,7 +507,7 @@ class _EmptyStateView extends StatelessWidget {
             textAlign: TextAlign.center,
             style: GoogleFonts.cairo(
               fontSize: 19,
-              fontWeight: FontWeight.w800,
+              fontWeight: FontWeight.w600,
               color: AppColors.textPrimary,
             ),
           ),
@@ -591,8 +566,8 @@ class _NotificationSettingsPrompt extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(16),
         boxShadow: const [
           BoxShadow(
             color: AppColors.shadowCard,
@@ -632,10 +607,10 @@ class _NotificationSettingsPrompt extends StatelessWidget {
           const SizedBox(width: 10),
           Material(
             color: AppColors.primary.withValues(alpha: 0.10),
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(16),
             child: InkWell(
               onTap: action,
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(16),
               child: Padding(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 14,
@@ -645,7 +620,7 @@ class _NotificationSettingsPrompt extends StatelessWidget {
                   label,
                   style: GoogleFonts.cairo(
                     fontSize: 12.5,
-                    fontWeight: FontWeight.w800,
+                    fontWeight: FontWeight.w600,
                     color: AppColors.primary,
                   ),
                 ),

@@ -1,6 +1,6 @@
 class ApiConstants {
   // الدومين الفعلي للسيرفر
-  static const String baseUrl = 'https://aila.ly';
+  static const String baseUrl = 'https://lunora.ly';
 
   static const String apiBaseUrl = '$baseUrl/api/flutter';
 

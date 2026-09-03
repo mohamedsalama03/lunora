@@ -5,8 +5,9 @@ import 'package:app_aila/core/theme/app_icons.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
-import '../../../core/theme/app_colors.dart';
+import '../../../core/navigation/app_shell_controller.dart';
 import '../../../core/utils/app_notifications.dart';
+import '../../../shared/widgets/custom_navbar.dart';
 import '../../addresses/models/address_model.dart';
 import '../../addresses/providers/address_provider.dart';
 import '../../addresses/screens/address_list_screen.dart';
@@ -20,6 +21,22 @@ import '../../orders/screens/order_detail_screen.dart';
 import '../../orders/screens/order_moamalat_screen.dart';
 import '../../wallet/providers/wallet_provider.dart';
 import '../providers/cart_provider.dart';
+
+class _AuraColors {
+  _AuraColors._();
+
+  static const primary = Color(0xFF4A3428);
+  static const roseGold = primary;
+  static const rosePink = Color(0xFFC8B59E);
+  static const blush = Color(0xFFEADCC8);
+  static const background = Color(0xFFF8F5F0);
+  static const surface = Color(0xFFFCFAF6);
+  static const surfaceVariant = Color(0xFFF2ECE3);
+  static const divider = Color(0xFFE4DBCE);
+  static const mauve = Color(0xFF2E211B);
+  static const taupe = Color(0xFF6D5A4D);
+  static const textHint = Color(0xFF9B8A7D);
+}
 
 class CheckoutScreen extends StatefulWidget {
   const CheckoutScreen({super.key});
@@ -525,8 +542,38 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     );
   }
 
+  Future<void> _handleNavigationTap(int index) async {
+    if (context.read<OrdersProvider>().isCreatingOrder ||
+        _isEstimatingShipping) {
+      return;
+    }
+    final auth = context.read<AuthProvider>();
+    if (index == AppShellController.profileIndex && !auth.isAuthenticated) {
+      final action = await showAuthRequiredDialog(
+        context,
+        badge: 'هذه الصفحة تحتاج حسابًا',
+        title: 'سجّلي دخولك للوصول إلى حسابك',
+        message: 'طلباتك وعناوينك ومحفظتك محفوظة بأمان داخل حسابك.',
+        primaryLabel: 'تسجيل الدخول',
+        secondaryLabel: 'لاحقًا',
+        icon: AppIcons.person_outline_rounded,
+      );
+      if (!mounted || action != AuthPromptAction.login) return;
+      final authenticated = await Navigator.of(context).push<bool>(
+        MaterialPageRoute<bool>(
+          builder: (_) => const LoginScreen(returnAfterAuth: true),
+        ),
+      );
+      if (!mounted || authenticated != true) return;
+    }
+    if (!mounted) return;
+    context.read<AppShellController>().setIndex(index);
+    Navigator.of(context).popUntil((route) => route.isFirst);
+  }
+
   @override
   Widget build(BuildContext context) {
+    final shellIndex = context.watch<AppShellController>().currentIndex;
     final itemCount = context.select<CartProvider, int>(
       (cart) => cart.itemCount,
     );
@@ -558,32 +605,41 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
-        backgroundColor: const Color(0xFFFFF6F5),
+        backgroundColor: _AuraColors.background,
+        extendBody: true,
         body: SafeArea(
           bottom: false,
           child: SingleChildScrollView(
             physics: const BouncingScrollPhysics(),
-            padding: const EdgeInsets.fromLTRB(15, 14, 15, 128),
+            padding: const EdgeInsets.fromLTRB(24, 18, 24, 220),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const _CheckoutHeader(),
-                const SizedBox(height: 22),
+                const SizedBox(height: 20),
+                _CheckoutProgress(
+                  currentStep: _selectedAddress == null
+                      ? 0
+                      : !hasSupportedShipping
+                      ? 1
+                      : 2,
+                ),
+                const SizedBox(height: 24),
                 _buildShippingForm(lookups),
-                const SizedBox(height: 22),
+                const SizedBox(height: 16),
                 _buildDeliveryMethodCard(
                   hasSelectedAddress: _selectedAddress != null,
                   hasSupportedShipping: hasSupportedShipping,
                   shippingCost: shippingCost,
                 ),
-                const SizedBox(height: 22),
+                const SizedBox(height: 16),
                 if (lookupsLoading)
                   const _CheckoutSectionCard(
                     child: SizedBox(
                       height: 78,
                       child: Center(
                         child: CircularProgressIndicator(
-                          color: AppColors.roseGold,
+                          color: _AuraColors.roseGold,
                         ),
                       ),
                     ),
@@ -607,10 +663,18 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             ),
           ),
         ),
-        bottomNavigationBar: _BottomBar(
-          total: total,
-          isLoading: isCreating,
-          onConfirm: isCreating || _isEstimatingShipping ? null : _placeOrder,
+        bottomNavigationBar: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _BottomBar(
+              total: total,
+              isLoading: isCreating,
+              onConfirm: isCreating || _isEstimatingShipping
+                  ? null
+                  : _placeOrder,
+            ),
+            CustomNavBar(currentIndex: shellIndex, onTap: _handleNavigationTap),
+          ],
         ),
       ),
     );
@@ -643,7 +707,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               style: GoogleFonts.cairo(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
-                color: AppColors.mauve,
+                color: _AuraColors.mauve,
                 height: 1.1,
               ),
             ),
@@ -655,7 +719,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               style: GoogleFonts.cairo(
                 fontSize: 12,
                 fontWeight: FontWeight.w400,
-                color: AppColors.taupe,
+                color: _AuraColors.taupe,
                 height: 1.35,
               ),
             ),
@@ -673,7 +737,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                   fontSize: 11,
                   fontWeight: FontWeight.w600,
                   color: hasSupportedShipping
-                      ? AppColors.taupe
+                      ? _AuraColors.taupe
                       : const Color(0xFFB45309),
                 ),
               ),
@@ -684,7 +748,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               style: GoogleFonts.cairo(
                 fontSize: 12.5,
                 fontWeight: FontWeight.w400,
-                color: AppColors.taupe,
+                color: _AuraColors.taupe,
                 height: 1.45,
               ),
             ),
@@ -759,29 +823,20 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             title: 'طريقة الدفع',
           ),
           const SizedBox(height: 18),
-          Row(
-            children: methods.map((method) {
-              final isInsufficient = method.isWallet && walletBalance < total;
-              return Expanded(
-                child: Padding(
-                  padding: EdgeInsets.only(
-                    left: method == methods.last ? 0 : 8,
-                  ),
-                  child: _PaymentMethodPill(
-                    label: _paymentDisplayLabel(method),
-                    value: method.key,
-                    groupValue: _selectedPaymentMethod,
-                    isDisabled: isInsufficient,
-                    onChanged: isInsufficient
-                        ? null
-                        : (value) => setState(() {
-                            _selectedPaymentMethod = value;
-                          }),
-                  ),
-                ),
-              );
-            }).toList(),
-          ),
+          for (var index = 0; index < methods.length; index++) ...[
+            _PaymentMethodPill(
+              label: _paymentDisplayLabel(methods[index]),
+              value: methods[index].key,
+              groupValue: _selectedPaymentMethod,
+              isDisabled: methods[index].isWallet && walletBalance < total,
+              onChanged: methods[index].isWallet && walletBalance < total
+                  ? null
+                  : (value) => setState(() {
+                      _selectedPaymentMethod = value;
+                    }),
+            ),
+            if (index < methods.length - 1) const SizedBox(height: 10),
+          ],
           if (methods.any((method) => method.isWallet && walletBalance < total))
             Padding(
               padding: const EdgeInsets.only(top: 12),
@@ -817,7 +872,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             style: GoogleFonts.cairo(
               fontSize: 12.5,
               fontWeight: FontWeight.w500,
-              color: AppColors.taupe,
+              color: _AuraColors.taupe,
               height: 1.4,
             ),
           ),
@@ -885,7 +940,10 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           const SizedBox(height: 13),
           _SummaryRow(title: 'الضريبة', value: _formatMoney(0)),
           const SizedBox(height: 17),
-          Divider(color: AppColors.divider.withValues(alpha: 0.85), height: 1),
+          Divider(
+            color: _AuraColors.divider.withValues(alpha: 0.85),
+            height: 1,
+          ),
           const SizedBox(height: 20),
           _SummaryRow(
             title: 'الإجمالي',
@@ -894,6 +952,98 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _CheckoutProgress extends StatelessWidget {
+  final int currentStep;
+
+  const _CheckoutProgress({required this.currentStep});
+
+  @override
+  Widget build(BuildContext context) {
+    const labels = ['العنوان', 'التوصيل', 'الدفع'];
+
+    return Row(
+      children: [
+        for (var index = 0; index < labels.length; index++) ...[
+          _CheckoutProgressStep(
+            index: index,
+            label: labels[index],
+            isActive: index == currentStep,
+            isComplete: index < currentStep,
+          ),
+          if (index < labels.length - 1)
+            Expanded(
+              child: Container(
+                height: 1,
+                margin: const EdgeInsets.symmetric(horizontal: 8),
+                color: index < currentStep
+                    ? _AuraColors.primary
+                    : _AuraColors.divider,
+              ),
+            ),
+        ],
+      ],
+    );
+  }
+}
+
+class _CheckoutProgressStep extends StatelessWidget {
+  final int index;
+  final String label;
+  final bool isActive;
+  final bool isComplete;
+
+  const _CheckoutProgressStep({
+    required this.index,
+    required this.label,
+    required this.isActive,
+    required this.isComplete,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final emphasized = isActive || isComplete;
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        AnimatedContainer(
+          duration: const Duration(milliseconds: 180),
+          width: 28,
+          height: 28,
+          decoration: BoxDecoration(
+            color: emphasized ? _AuraColors.primary : _AuraColors.blush,
+            shape: BoxShape.circle,
+          ),
+          alignment: Alignment.center,
+          child: isComplete
+              ? const Icon(
+                  AppIcons.check_rounded,
+                  size: 14,
+                  color: _AuraColors.surface,
+                )
+              : Text(
+                  '${index + 1}',
+                  style: GoogleFonts.cairo(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                    color: emphasized ? _AuraColors.surface : _AuraColors.taupe,
+                  ),
+                ),
+        ),
+        const SizedBox(height: 5),
+        Text(
+          label,
+          style: GoogleFonts.cairo(
+            fontSize: 10,
+            fontWeight: isActive ? FontWeight.w600 : FontWeight.w400,
+            color: isActive ? _AuraColors.mauve : _AuraColors.taupe,
+          ),
+        ),
+      ],
     );
   }
 }
@@ -917,20 +1067,16 @@ class _CheckoutHeader extends StatelessWidget {
                 width: 40,
                 height: 40,
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: _AuraColors.surface,
                   shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppColors.roseGold.withValues(alpha: 0.04),
-                      blurRadius: 14,
-                      offset: const Offset(0, 6),
-                    ),
-                  ],
+                  border: Border.all(
+                    color: _AuraColors.divider.withValues(alpha: 0.75),
+                  ),
                 ),
                 child: const Icon(
                   AppIcons.arrow_forward_ios_rounded,
                   size: 18,
-                  color: AppColors.mauve,
+                  color: _AuraColors.mauve,
                 ),
               ),
             ),
@@ -938,9 +1084,9 @@ class _CheckoutHeader extends StatelessWidget {
           Text(
             'إتمام الطلب',
             style: GoogleFonts.cairo(
-              fontSize: 18,
+              fontSize: 16,
               fontWeight: FontWeight.w600,
-              color: AppColors.mauve,
+              color: _AuraColors.mauve,
             ),
           ),
         ],
@@ -955,7 +1101,7 @@ class _CheckoutSectionCard extends StatelessWidget {
 
   const _CheckoutSectionCard({
     required this.child,
-    this.padding = const EdgeInsets.fromLTRB(19, 20, 19, 20),
+    this.padding = const EdgeInsets.all(16),
   });
 
   @override
@@ -964,15 +1110,9 @@ class _CheckoutSectionCard extends StatelessWidget {
       width: double.infinity,
       padding: padding,
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(30),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.roseGold.withValues(alpha: 0.045),
-            blurRadius: 24,
-            offset: const Offset(0, 10),
-          ),
-        ],
+        color: _AuraColors.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: _AuraColors.divider.withValues(alpha: 0.68)),
       ),
       child: child,
     );
@@ -996,7 +1136,16 @@ class _CheckoutSectionTitle extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Icon(icon, size: 16, color: AppColors.roseGold),
+        Container(
+          width: 36,
+          height: 36,
+          decoration: const BoxDecoration(
+            color: _AuraColors.blush,
+            shape: BoxShape.circle,
+          ),
+          alignment: Alignment.center,
+          child: Icon(icon, size: 16, color: _AuraColors.primary),
+        ),
         const SizedBox(width: 8),
         Expanded(
           child: Text(
@@ -1004,9 +1153,9 @@ class _CheckoutSectionTitle extends StatelessWidget {
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: GoogleFonts.cairo(
-              fontSize: 15.5,
-              fontWeight: FontWeight.w700,
-              color: AppColors.mauve,
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: _AuraColors.mauve,
               height: 1,
             ),
           ),
@@ -1022,7 +1171,7 @@ class _CheckoutSectionTitle extends StatelessWidget {
                 style: GoogleFonts.cairo(
                   fontSize: 11,
                   fontWeight: FontWeight.w600,
-                  color: AppColors.roseGold,
+                  color: _AuraColors.primary,
                   letterSpacing: 0.6,
                 ),
               ),
@@ -1057,20 +1206,20 @@ class _SoftOutlineButton extends StatelessWidget {
             color: Colors.white,
             borderRadius: BorderRadius.circular(999),
             border: Border.all(
-              color: AppColors.rosePink.withValues(alpha: 0.3),
+              color: _AuraColors.rosePink.withValues(alpha: 0.3),
             ),
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(icon, size: 16, color: AppColors.roseGold),
+              Icon(icon, size: 16, color: _AuraColors.roseGold),
               const SizedBox(width: 7),
               Text(
                 label,
                 style: GoogleFonts.cairo(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
-                  color: AppColors.taupe,
+                  color: _AuraColors.taupe,
                 ),
               ),
             ],
@@ -1091,19 +1240,19 @@ class _DeliveryOptionRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return AnimatedContainer(
       duration: const Duration(milliseconds: 180),
-      height: 46,
+      height: 60,
       padding: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(999),
-        border: Border.all(color: AppColors.rosePink.withValues(alpha: 0.45)),
+        color: _AuraColors.blush.withValues(alpha: 0.42),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: _AuraColors.primary),
       ),
       child: Row(
         children: [
           const Icon(
             AppIcons.radio_button_checked_rounded,
             size: 17,
-            color: AppColors.roseGold,
+            color: _AuraColors.primary,
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -1114,7 +1263,7 @@ class _DeliveryOptionRow extends StatelessWidget {
               style: GoogleFonts.cairo(
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
-                color: AppColors.mauve,
+                color: _AuraColors.mauve,
               ),
             ),
           ),
@@ -1125,7 +1274,7 @@ class _DeliveryOptionRow extends StatelessWidget {
             style: GoogleFonts.cairo(
               fontSize: 12,
               fontWeight: FontWeight.w600,
-              color: AppColors.roseGold,
+              color: _AuraColors.primary,
             ),
           ),
         ],
@@ -1152,41 +1301,63 @@ class _PaymentMethodPill extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isSelected = value == groupValue;
+    final icon = value == 'wallet'
+        ? AppIcons.account_balance_wallet_outlined
+        : value == 'cod'
+        ? AppIcons.money_rounded
+        : AppIcons.credit_card_rounded;
 
     return GestureDetector(
       onTap: isDisabled ? null : () => onChanged?.call(value),
       behavior: HitTestBehavior.opaque,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 180),
-        height: 43,
-        alignment: Alignment.center,
+        height: 64,
+        padding: const EdgeInsets.symmetric(horizontal: 14),
         decoration: BoxDecoration(
           color: isDisabled
-              ? AppColors.surfaceVariant.withValues(alpha: 0.55)
+              ? _AuraColors.surfaceVariant.withValues(alpha: 0.55)
               : isSelected
-              ? const Color(0xFFC77F91)
-              : Colors.white,
-          borderRadius: BorderRadius.circular(999),
-          border: isSelected
-              ? null
-              : Border.all(
-                  color: AppColors.rosePink.withValues(alpha: 0.28),
-                  width: 1,
-                ),
-        ),
-        child: Text(
-          label,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          style: GoogleFonts.cairo(
-            fontSize: 12.5,
-            fontWeight: FontWeight.w600,
-            color: isDisabled
-                ? AppColors.textHint
-                : isSelected
-                ? Colors.white
-                : AppColors.taupe,
+              ? _AuraColors.blush.withValues(alpha: 0.42)
+              : _AuraColors.surface,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: isSelected ? _AuraColors.primary : _AuraColors.divider,
           ),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 40,
+              height: 40,
+              decoration: const BoxDecoration(
+                color: _AuraColors.blush,
+                shape: BoxShape.circle,
+              ),
+              alignment: Alignment.center,
+              child: Icon(icon, size: 17, color: _AuraColors.primary),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: GoogleFonts.cairo(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  color: isDisabled ? _AuraColors.textHint : _AuraColors.mauve,
+                ),
+              ),
+            ),
+            Icon(
+              isSelected
+                  ? AppIcons.check_rounded
+                  : AppIcons.radio_button_unchecked_rounded,
+              size: 17,
+              color: isSelected ? _AuraColors.primary : _AuraColors.textHint,
+            ),
+          ],
         ),
       ),
     );
@@ -1210,12 +1381,12 @@ class _SummaryRow extends StatelessWidget {
         ? GoogleFonts.cairo(
             fontSize: 16,
             fontWeight: FontWeight.w600,
-            color: AppColors.mauve,
+            color: _AuraColors.mauve,
           )
         : GoogleFonts.cairo(
             fontSize: 14,
             fontWeight: FontWeight.w400,
-            color: AppColors.taupe,
+            color: _AuraColors.taupe,
           );
 
     return Row(
@@ -1227,8 +1398,8 @@ class _SummaryRow extends StatelessWidget {
           textDirection: TextDirection.rtl,
           style: GoogleFonts.cairo(
             fontSize: isTotal ? 16 : 14,
-            fontWeight: FontWeight.w700,
-            color: AppColors.mauve,
+            fontWeight: FontWeight.w600,
+            color: _AuraColors.mauve,
           ),
         ),
       ],
@@ -1249,48 +1420,57 @@ class _BottomBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: Colors.white,
-      padding: const EdgeInsets.fromLTRB(15, 17, 15, 0),
-      child: SafeArea(
-        top: false,
-        minimum: const EdgeInsets.only(bottom: 10),
-        child: Opacity(
-          opacity: onConfirm == null ? 0.62 : 1,
-          child: Material(
-            color: Colors.transparent,
-            child: InkWell(
-              onTap: onConfirm,
-              borderRadius: BorderRadius.circular(999),
-              child: Ink(
-                height: 52,
-                decoration: BoxDecoration(
-                  color: const Color(0xFFC77F91),
-                  borderRadius: BorderRadius.circular(999),
-                  boxShadow: const [
-                    BoxShadow(
-                      color: AppColors.shadowSoft,
-                      blurRadius: 20,
-                      offset: Offset(0, 10),
-                    ),
-                  ],
-                ),
-                child: Center(
+    return ColoredBox(
+      color: _AuraColors.background,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(24, 8, 24, 4),
+        child: Container(
+          decoration: const BoxDecoration(color: Colors.transparent),
+          child: Opacity(
+            opacity: onConfirm == null ? 0.62 : 1,
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: onConfirm,
+                borderRadius: BorderRadius.circular(999),
+                child: Ink(
+                  height: 56,
+                  decoration: BoxDecoration(
+                    color: _AuraColors.primary,
+                    borderRadius: BorderRadius.circular(999),
+                  ),
                   child: isLoading
-                      ? const SizedBox(
-                          width: 22,
-                          height: 22,
-                          child: CircularProgressIndicator(
-                            color: Colors.white,
-                            strokeWidth: 2.4,
+                      ? const Center(
+                          child: SizedBox.square(
+                            dimension: 22,
+                            child: CircularProgressIndicator(
+                              color: _AuraColors.surface,
+                              strokeWidth: 2.4,
+                            ),
                           ),
                         )
-                      : Text(
-                          'تأكيد الطلب · ${_formatMoney(total)}',
-                          style: GoogleFonts.cairo(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w700,
-                            color: Colors.white,
+                      : Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 22),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                'تأكيد الطلب',
+                                style: GoogleFonts.cairo(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                  color: _AuraColors.surface,
+                                ),
+                              ),
+                              Text(
+                                _formatMoney(total),
+                                style: GoogleFonts.cairo(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                  color: _AuraColors.surface,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                 ),
@@ -1319,10 +1499,12 @@ String _formatAddressLine(AddressModel address) {
 }
 
 String _formatMoney(num value) {
-  return '${value.round()} د.ل';
+  final amount = value.toDouble();
+  final decimals = amount % 1 == 0 ? 0 : 2;
+  return '${amount.toStringAsFixed(decimals)} د.ل';
 }
 
 String _formatShippingMoney(double value) {
   if (value <= 0) return 'مجاني';
-  return '${value.round()} د.ل';
+  return _formatMoney(value);
 }

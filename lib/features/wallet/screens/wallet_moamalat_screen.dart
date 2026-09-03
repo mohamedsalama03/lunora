@@ -33,7 +33,7 @@ class _WalletMoamalatScreenState extends State<WalletMoamalatScreen> {
     super.initState();
     _controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
-      ..setBackgroundColor(const Color(0xFFFCEEF0))
+      ..setBackgroundColor(AppColors.background)
       ..setNavigationDelegate(
         NavigationDelegate(
           onPageStarted: (_) {
@@ -76,12 +76,15 @@ class _WalletMoamalatScreenState extends State<WalletMoamalatScreen> {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&display=swap" rel="stylesheet">
   <title>معاملات - شحن المحفظة</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
-      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-      background: #FFF8F7;
+      font-family: 'Cairo', sans-serif;
+      background: #F8F5F0;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -91,15 +94,15 @@ class _WalletMoamalatScreenState extends State<WalletMoamalatScreen> {
     }
     .loader {
       text-align: center;
-      color: #5A2E36;
+      color: #2E211B;
       font-size: 15px;
       padding: 20px;
     }
     .loader .spinner {
       width: 40px;
       height: 40px;
-      border: 3px solid #F8E7EA;
-      border-top-color: #B76E79;
+      border: 3px solid #EADCC8;
+      border-top-color: #4A3428;
       border-radius: 50%;
       animation: spin 0.8s linear infinite;
       margin: 0 auto 16px;
@@ -488,7 +491,7 @@ class _WalletMoamalatScreenState extends State<WalletMoamalatScreen> {
         }
       },
       child: Scaffold(
-        backgroundColor: const Color(0xFFFCEEF0),
+        backgroundColor: AppColors.background,
         appBar: AppBar(
           backgroundColor: AppColors.surface,
           elevation: 0,
@@ -504,7 +507,7 @@ class _WalletMoamalatScreenState extends State<WalletMoamalatScreen> {
             'الدفع عبر معاملات',
             style: GoogleFonts.cairo(
               fontSize: 18,
-              fontWeight: FontWeight.w800,
+              fontWeight: FontWeight.w600,
               color: AppColors.textPrimary,
             ),
           ),
@@ -518,7 +521,7 @@ class _WalletMoamalatScreenState extends State<WalletMoamalatScreen> {
               ),
             if (_isProcessing)
               Container(
-                color: AppColors.mauve.withValues(alpha: 0.52),
+                color: AppColors.textPrimary.withValues(alpha: 0.52),
                 child: Center(
                   child: Container(
                     padding: const EdgeInsets.symmetric(
@@ -527,8 +530,8 @@ class _WalletMoamalatScreenState extends State<WalletMoamalatScreen> {
                     ),
                     margin: const EdgeInsets.all(32),
                     decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(24),
+                      color: AppColors.surface,
+                      borderRadius: BorderRadius.circular(16),
                     ),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
@@ -542,7 +545,7 @@ class _WalletMoamalatScreenState extends State<WalletMoamalatScreen> {
                           'جاري معالجة الدفع...',
                           style: GoogleFonts.cairo(
                             fontSize: 15,
-                            fontWeight: FontWeight.w700,
+                            fontWeight: FontWeight.w600,
                             color: AppColors.textPrimary,
                           ),
                         ),

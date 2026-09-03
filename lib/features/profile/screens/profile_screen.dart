@@ -4,14 +4,15 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
-import '../../../core/theme/app_colors.dart';
 import '../../../core/navigation/app_shell_controller.dart';
+import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/app_notifications.dart';
 import '../../addresses/screens/address_list_screen.dart';
 import '../../auth/providers/auth_provider.dart';
 import '../../policies/screens/legal_policies_screen.dart';
 import '../../wallet/providers/wallet_provider.dart';
 import '../../wallet/screens/wallet_screen.dart';
+import '../../wishlist/providers/wishlist_provider.dart';
 import 'about_app_screen.dart';
 import 'edit_profile_screen.dart';
 import 'orders_screen.dart';
@@ -20,8 +21,7 @@ import 'shipping_delivery_policy_screen.dart';
 import 'support_screen.dart';
 import '../../orders/providers/orders_provider.dart';
 
-/// AILA profile — rose-gradient curved header with avatar + stats, followed by
-/// grouped list cards (mirrors the Lovable web design).
+/// LUNORA profile with Aura's warm editorial card and grouped account actions.
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
 
@@ -32,17 +32,17 @@ class ProfileScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppColors.background,
       body: AnnotatedRegion<SystemUiOverlayStyle>(
-        value: SystemUiOverlayStyle.light,
+        value: SystemUiOverlayStyle.dark,
         child: SingleChildScrollView(
           physics: const BouncingScrollPhysics(),
-          padding: const EdgeInsets.only(bottom: 40),
+          padding: const EdgeInsets.only(bottom: 120),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const _ProfileHeader(),
-              const SizedBox(height: 22),
+              const SizedBox(height: 32),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
+                padding: const EdgeInsets.symmetric(horizontal: 24),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -91,7 +91,7 @@ class ProfileScreen extends StatelessWidget {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 22),
+                    const SizedBox(height: 32),
                     _MenuGroup(
                       title: 'حول المتجر',
                       items: [
@@ -163,7 +163,7 @@ class ProfileScreen extends StatelessWidget {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 22),
+                    const SizedBox(height: 32),
                     _MenuGroup(
                       title: 'إدارة الحساب',
                       items: [
@@ -265,7 +265,7 @@ class _DeleteAccountDialogState extends State<_DeleteAccountDialog> {
           'حذف الحساب نهائيًا؟',
           style: GoogleFonts.cairo(
             fontSize: 18,
-            fontWeight: FontWeight.w800,
+            fontWeight: FontWeight.w600,
             color: AppColors.textPrimary,
           ),
         ),
@@ -332,7 +332,7 @@ class _DeleteAccountDialogState extends State<_DeleteAccountDialog> {
                 style: GoogleFonts.cairo(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
-                  color: const Color(0xFFC75D6A),
+                  color: AppColors.error,
                 ),
               ),
             ],
@@ -346,7 +346,7 @@ class _DeleteAccountDialogState extends State<_DeleteAccountDialog> {
           FilledButton(
             onPressed: _isDeleting ? null : _deleteAccount,
             style: FilledButton.styleFrom(
-              backgroundColor: const Color(0xFFC75D6A),
+              backgroundColor: AppColors.error,
               foregroundColor: Colors.white,
             ),
             child: _isDeleting
@@ -360,7 +360,7 @@ class _DeleteAccountDialogState extends State<_DeleteAccountDialog> {
                   )
                 : Text(
                     'حذف نهائي',
-                    style: GoogleFonts.cairo(fontWeight: FontWeight.w700),
+                    style: GoogleFonts.cairo(fontWeight: FontWeight.w600),
                   ),
           ),
         ],
@@ -399,6 +399,9 @@ class _ProfileHeaderState extends State<_ProfileHeader> {
   @override
   Widget build(BuildContext context) {
     final topPad = MediaQuery.viewPaddingOf(context).top;
+    final savedCount = context.select<WishlistProvider, int>(
+      (wishlist) => wishlist.itemCount,
+    );
 
     return Consumer3<AuthProvider, WalletProvider, OrdersProvider>(
       builder: (context, auth, wallet, orders, _) {
@@ -410,88 +413,122 @@ class _ProfileHeaderState extends State<_ProfileHeader> {
             ? userName.characters.first.toUpperCase()
             : 'A';
 
-        final balance =
-            wallet.summary?.balance.toStringAsFixed(2) ??
-            user?.walletBalance.toStringAsFixed(2) ??
-            '0.00';
-        final totalOrders = orders.totalOrdersCount;
-        final isLoadingOrders = orders.isLoadingOrderCounts;
+        final balance = auth.isAuthenticated
+            ? wallet.summary?.balance.toStringAsFixed(2) ??
+                  user?.walletBalance.toStringAsFixed(2) ??
+                  '0.00'
+            : '0.00';
+        final totalOrders = auth.isAuthenticated ? orders.totalOrdersCount : 0;
+        final isLoadingOrders =
+            auth.isAuthenticated && orders.isLoadingOrderCounts;
 
         return Container(
           width: double.infinity,
-          padding: EdgeInsets.fromLTRB(24, topPad + 24, 24, 28),
-          decoration: const BoxDecoration(
-            gradient: AppColors.roseGradient,
-            borderRadius: BorderRadius.only(
-              bottomLeft: Radius.circular(40),
-              bottomRight: Radius.circular(40),
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: AppColors.shadowSoft,
-                blurRadius: 30,
-                offset: Offset(0, 14),
-              ),
-            ],
+          margin: EdgeInsets.fromLTRB(24, topPad + 24, 24, 0),
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: AppColors.primary,
+            borderRadius: BorderRadius.circular(28),
           ),
           child: Column(
             children: [
+              Align(
+                alignment: AlignmentDirectional.centerStart,
+                child: Text(
+                  'MEMBER · LUNORA',
+                  style: GoogleFonts.cairo(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.white.withValues(alpha: 0.7),
+                    letterSpacing: 1.8,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  Container(
+                    width: 64,
+                    height: 64,
+                    decoration: const BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: AppColors.secondary,
+                    ),
+                    alignment: Alignment.center,
+                    child: Text(
+                      avatarLabel,
+                      style: GoogleFonts.cairo(
+                        fontSize: 22,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.primary,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          user?.name ?? 'مرحباً بكِ في لونورا',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: GoogleFonts.cairo(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white,
+                          ),
+                        ),
+                        const SizedBox(height: 3),
+                        Text(
+                          user?.email ?? 'سجّلي الدخول للوصول إلى حسابك',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: GoogleFonts.cairo(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.white.withValues(alpha: 0.78),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
               Container(
-                width: 84,
-                height: 84,
-                decoration: const BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.white,
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppColors.shadowFloat,
-                      blurRadius: 20,
-                      offset: Offset(0, 8),
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                decoration: BoxDecoration(
+                  color: AppColors.surface.withValues(alpha: 0.08),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                    color: AppColors.surface.withValues(alpha: 0.10),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: _HeaderStat(
+                        label: 'الطلبات',
+                        value: isLoadingOrders ? '...' : '$totalOrders',
+                      ),
+                    ),
+                    const _HeaderStatDivider(),
+                    Expanded(
+                      child: _HeaderStat(
+                        label: 'الرصيد',
+                        value: '$balance د.ل',
+                      ),
+                    ),
+                    const _HeaderStatDivider(),
+                    Expanded(
+                      child: _HeaderStat(
+                        label: 'المحفوظات',
+                        value: '$savedCount',
+                      ),
                     ),
                   ],
                 ),
-                alignment: Alignment.center,
-                child: Text(
-                  avatarLabel,
-                  style: GoogleFonts.cairo(
-                    fontSize: 34,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.roseGold,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 14),
-              Text(
-                user?.name ?? 'مرحباً بكِ في آيلا',
-                style: GoogleFonts.cairo(
-                  fontSize: 21,
-                  fontWeight: FontWeight.w800,
-                  color: Colors.white,
-                ),
-              ),
-              const SizedBox(height: 3),
-              Text(
-                user?.email ?? 'سجّلي الدخول للوصول إلى حسابك',
-                style: GoogleFonts.cairo(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.white.withValues(alpha: 0.85),
-                ),
-              ),
-              const SizedBox(height: 20),
-              Row(
-                children: [
-                  Expanded(
-                    child: _HeaderStat(
-                      label: 'الطلبات',
-                      value: isLoadingOrders ? '...' : '$totalOrders',
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: _HeaderStat(label: 'الرصيد', value: '$balance د.ل'),
-                  ),
-                ],
               ),
             ],
           ),
@@ -509,13 +546,8 @@ class _HeaderStat extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 10),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.18),
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.22)),
-      ),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 6),
       child: Column(
         children: [
           Text(
@@ -524,7 +556,7 @@ class _HeaderStat extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
             style: GoogleFonts.cairo(
               fontSize: 16,
-              fontWeight: FontWeight.w900,
+              fontWeight: FontWeight.w600,
               color: Colors.white,
               height: 1.1,
             ),
@@ -544,6 +576,19 @@ class _HeaderStat extends StatelessWidget {
   }
 }
 
+class _HeaderStatDivider extends StatelessWidget {
+  const _HeaderStatDivider();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 1,
+      height: 34,
+      color: AppColors.surface.withValues(alpha: 0.18),
+    );
+  }
+}
+
 class _MenuGroup extends StatelessWidget {
   final String title;
   final List<_MenuRow> items;
@@ -556,28 +601,24 @@ class _MenuGroup extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.only(right: 4, bottom: 10),
+          padding: const EdgeInsets.only(bottom: 12),
           child: Text(
             title,
             style: GoogleFonts.cairo(
-              fontSize: 13,
-              fontWeight: FontWeight.w800,
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
               color: AppColors.taupe,
-              letterSpacing: 0.5,
+              letterSpacing: 0.8,
             ),
           ),
         ),
         Container(
           decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(24),
-            boxShadow: const [
-              BoxShadow(
-                color: AppColors.shadowCard,
-                blurRadius: 20,
-                offset: Offset(0, 8),
-              ),
-            ],
+            color: AppColors.surface,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: AppColors.divider.withValues(alpha: 0.72),
+            ),
           ),
           child: Column(
             children: [
@@ -589,7 +630,7 @@ class _MenuGroup extends StatelessWidget {
                     child: Divider(
                       height: 1,
                       thickness: 1,
-                      color: AppColors.blush,
+                      color: AppColors.divider.withValues(alpha: 0.8),
                     ),
                   ),
               ],
@@ -616,23 +657,23 @@ class _MenuRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = isDestructive ? const Color(0xFFC75D6A) : AppColors.mauve;
+    final color = isDestructive ? AppColors.error : AppColors.mauve;
 
     return Material(
       color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(16),
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+          padding: const EdgeInsets.all(16),
           child: Row(
             children: [
               Container(
-                width: 38,
-                height: 38,
+                width: 40,
+                height: 40,
                 decoration: BoxDecoration(
                   color: isDestructive
-                      ? const Color(0xFFC75D6A).withValues(alpha: 0.10)
+                      ? AppColors.error.withValues(alpha: 0.10)
                       : AppColors.blush,
                   shape: BoxShape.circle,
                 ),
@@ -640,9 +681,7 @@ class _MenuRow extends StatelessWidget {
                 child: Icon(
                   icon,
                   size: 19,
-                  color: isDestructive
-                      ? const Color(0xFFC75D6A)
-                      : AppColors.roseGold,
+                  color: isDestructive ? AppColors.error : AppColors.primary,
                   textDirection: TextDirection.ltr,
                 ),
               ),
@@ -651,8 +690,8 @@ class _MenuRow extends StatelessWidget {
                 child: Text(
                   label,
                   style: GoogleFonts.cairo(
-                    fontSize: 14.5,
-                    fontWeight: FontWeight.w700,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
                     color: color,
                   ),
                 ),
